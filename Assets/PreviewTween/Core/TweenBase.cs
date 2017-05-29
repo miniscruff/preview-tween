@@ -24,9 +24,10 @@
         [SerializeField] private T _end;
         private float _progress;
         private bool _isPlaying;
-        private int _pingPongDirection = 1;
+        private int _direction = 1;
 
         // settings
+        [SerializeField] private float _delay;
         [SerializeField] private float _duration = 1f;
         [SerializeField] private PlayMode _playMode;
         [SerializeField] private WrapMode _wrapMode;
@@ -52,6 +53,12 @@
         public bool isPlaying
         {
             get { return _isPlaying; }
+        }
+
+        public float delay
+        {
+            get { return _delay; }
+            set { _delay = value; }
         }
 
         public float duration
@@ -120,6 +127,11 @@
             // sample before starting our loop as well
             Sample();
 
+            if (_delay > 0f)
+            {
+                yield return new WaitForSeconds(_delay);
+            }
+
             while (_isPlaying)
             {
                 if (_progress >= 1f && wrapMode == WrapMode.Once)
@@ -138,16 +150,16 @@
                 }
                 else if (wrapMode == WrapMode.PingPong)
                 {
-                    _progress += Time.deltaTime / _duration * _pingPongDirection;
+                    _progress += Time.deltaTime / _duration * _direction;
                     if (_progress < 0f)
                     {
                         _progress *= -1;
-                        _pingPongDirection = 1;
+                        _direction = 1;
                     }
                     else if(_progress > 1f)
                     {
                         _progress = 2f - _progress;
-                        _pingPongDirection = -1;
+                        _direction = -1;
                     }
                 }
                 Sample();

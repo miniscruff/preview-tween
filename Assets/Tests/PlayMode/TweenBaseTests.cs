@@ -118,6 +118,29 @@
         }
 
         [UnityTest]
+        public IEnumerator PlayWithDelay_BeforeDelayStart_ThenNormal()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+            _tween.delay = 1f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.25f);
+
+            Assert.IsTrue(_tween.isPlaying);
+            Assert.AreEqual(0f, _tween.progress);
+
+            yield return new WaitForSeconds(0.75f);
+            Assert.AreNotEqual(0f, _tween.progress);
+
+            yield return new WaitForSeconds(1f);
+
+            Assert.IsFalse(_tween.isPlaying);
+            Assert.AreEqual(20f, _tween.value);
+        }
+
+        [UnityTest]
         public IEnumerator NonePlayMode_OnlyPlaysIfWeCallPlay()
         {
             _tween.playMode = PlayMode.None;
