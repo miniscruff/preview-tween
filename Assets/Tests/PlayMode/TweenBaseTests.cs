@@ -367,5 +367,41 @@
 
             Assert.IsTrue(_tween.isPlaying);
         }
+
+        [UnityTest]
+        public IEnumerator Toggle_GoesBackToStart()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.25f);
+            _tween.Toggle();
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsFalse(_tween.isPlaying);
+
+            Assert.AreEqual(10f, _tween.value);
+        }
+
+        [UnityTest]
+        public IEnumerator DoubleToggle_GoesToEnd()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.25f);
+            _tween.Toggle();
+            yield return new WaitForSeconds(0.1f);
+            _tween.Toggle();
+            yield return new WaitForSeconds(1f);
+
+            Assert.IsFalse(_tween.isPlaying);
+
+            Assert.AreEqual(20f, _tween.value);
+        }
     }
 }

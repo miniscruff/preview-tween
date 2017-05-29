@@ -107,14 +107,36 @@
 
         public void Play()
         {
-            // do nothing if we arent on...
-            if (!enabled)
+            if (!CanPlay())
             {
                 return;
             }
 
             _isPlaying = true;
             StartCoroutine(RunTween());
+        }
+
+        public void Toggle()
+        {
+            if (!CanPlay())
+            {
+                return;
+            }
+
+            if (progress <= 0f)
+            {
+                _direction = 1;
+            }
+            else if (progress >= 1f)
+            {
+                _direction = -1;
+            }
+            else
+            {
+                _direction *= -1;
+            }
+
+            Play();
         }
 
         public void Stop()
@@ -134,38 +156,50 @@
 
             while (_isPlaying)
             {
-                if (_progress >= 1f && wrapMode == WrapMode.Once)
-                {
-                    break;
-                }
                 yield return null;
 
-                if (wrapMode == WrapMode.Once)
+                _progress += Time.deltaTime / _duration * _direction;
+                if (_progress <= 0f || _progress >= 1f)
                 {
-                    _progress = Mathf.Clamp01(_progress + Time.deltaTime / _duration);
-                }
-                else if (wrapMode == WrapMode.Loop)
-                {
-                    _progress = (_progress + Time.deltaTime / _duration) % 1f;
-                }
-                else if (wrapMode == WrapMode.PingPong)
-                {
-                    _progress += Time.deltaTime / _duration * _direction;
-                    if (_progress < 0f)
-                    {
-                        _progress *= -1;
-                        _direction = 1;
-                    }
-                    else if(_progress > 1f)
-                    {
-                        _progress = 2f - _progress;
-                        _direction = -1;
-                    }
+                    HandleWrapping();
                 }
                 Sample();
             }
 
             _isPlaying = false;
+        }
+
+        private void HandleWrapping()
+        {
+            if (wrapMode == WrapMode.Once)
+            {
+                // we are now done
+                _isPlaying = false;
+            }
+            else if (wrapMode == WrapMode.Loop)
+            {
+                // we add one incase we are < 0
+                _progress = (_progress + 1f) % 1f;
+            }
+            else if (wrapMode == WrapMode.PingPong)
+            {
+                // ping pong bounces progress and flips direction
+                if (_progress < 0f)
+                {
+                    _progress *= -1;
+                    _direction = 1;
+                }
+                else if (_progress > 1f)
+                {
+                    _progress = 2f - _progress;
+                    _direction = -1;
+                }
+            }
+        }
+
+        private bool CanPlay()
+        {
+            return enabled;
         }
 
         protected abstract void UpdateValue(float time);
