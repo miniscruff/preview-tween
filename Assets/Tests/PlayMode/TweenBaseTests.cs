@@ -7,9 +7,12 @@
 
     public sealed class TestTween : TweenBase<float>
     {
-        protected override float UpdateValue(float time)
+        private float _value;
+        public float value { get { return _value; } }
+
+        protected override void UpdateValue(float time)
         {
-            return Mathf.Lerp(start, end, time);
+            _value = Mathf.Lerp(start, end, time);
         }
     }
 

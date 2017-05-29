@@ -5,9 +5,8 @@
 
     public abstract class TweenBase<T> : MonoBehaviour
     {
-        private T _start;
-        private T _end;
-        private T _value;
+        [SerializeField] private T _start;
+        [SerializeField] private T _end;
         private float _progress;
         private float _duration = 1f;
 
@@ -23,11 +22,6 @@
             set { _end = value; }
         }
 
-        public T value
-        {
-            get { return _value; }
-        }
-
         public float duration
         {
             get { return _duration; }
@@ -40,9 +34,15 @@
             set { _progress = value; }
         }
 
+        private void Start()
+        {
+            // default to playing on start for now
+            Play();
+        }
+
         public void Sample()
         {
-            _value = UpdateValue(_progress);
+            UpdateValue(_progress);
         }
 
         public void Play()
@@ -64,6 +64,6 @@
             }
         }
 
-        protected abstract T UpdateValue(float time);
+        protected abstract void UpdateValue(float time);
     }
 }
