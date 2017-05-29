@@ -35,7 +35,7 @@
         }
 
         [Test]
-        public void Sample_ProgressZero_HasStartValue()
+        public void Apply_ProgressZero_HasStartValue()
         {
             _tween.start = 10f;
             _tween.end = 25f;
@@ -45,7 +45,7 @@
         }
 
         [Test]
-        public void Sample_ProgressHalf_HasMiddleValue()
+        public void Apply_ProgressHalf_HasMiddleValue()
         {
             _tween.start = 10f;
             _tween.end = 20f;
@@ -56,7 +56,7 @@
         }
 
         [Test]
-        public void Sample_ProgressOne_HasEndValue()
+        public void Apply_ProgressOne_HasEndValue()
         {
             _tween.start = 10f;
             _tween.end = 25f;
@@ -473,7 +473,7 @@
         }
 
         [Test]
-        public void Sample_ProgressHalfWithEasing_HasMiddleValue()
+        public void Apply_ProgressHalfWithEasing_HasMiddleValue()
         {
             _tween.start = 10f;
             _tween.end = 20f;
