@@ -1,5 +1,6 @@
 ﻿namespace PreviewTween
 {
+    using System;
     using System.Collections;
     using UnityEngine;
 
@@ -31,6 +32,7 @@
         [SerializeField] private float _duration = 1f;
         [SerializeField] private PlayMode _playMode;
         [SerializeField] private WrapMode _wrapMode;
+        [SerializeField] private Easing _easing;
 
         public T start
         {
@@ -79,6 +81,12 @@
             set { _wrapMode = value; }
         }
 
+        public Easing easing
+        {
+            get { return _easing; }
+            set { _easing = value; }
+        }
+
         private void Start()
         {
             if (_playMode == PlayMode.Start)
@@ -102,7 +110,7 @@
 
         public void Sample()
         {
-            UpdateValue(_progress);
+            UpdateValue(GetSmoothTime());
         }
 
         public void Play()
@@ -186,8 +194,8 @@
         {
             if (wrapMode == WrapMode.Once)
             {
-                // we are now done
                 _isPlaying = false;
+                _progress = Mathf.Clamp01(_progress);
             }
             else if (wrapMode == WrapMode.Loop)
             {
@@ -215,6 +223,22 @@
             return enabled;
         }
 
-        protected abstract void UpdateValue(float time);
+        private float GetSmoothTime()
+        {
+            switch (_easing)
+            {
+                case Easing.Linear:
+                    return Easings.Linear(_progress);
+                case Easing.QuadraticIn:
+                    return Easings.QuadraticIn(_progress);
+                case Easing.QuadraticOut:
+                    return Easings.QuadraticOut(_progress);
+                case Easing.QuadraticInOut:
+                    return Easings.QuadraticInOut(_progress);
+            }
+            throw new NotImplementedException("Easing [" + _easing + "] not yet implemented");
+        }
+
+        protected abstract void UpdateValue(float smoothTime);
     }
 }

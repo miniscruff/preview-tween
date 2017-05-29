@@ -10,9 +10,9 @@
         private float _value;
         public float value { get { return _value; } }
 
-        protected override void UpdateValue(float time)
+        protected override void UpdateValue(float smoothTime)
         {
-            _value = Mathf.Lerp(start, end, time);
+            _value = Mathf.LerpUnclamped(start, end, smoothTime);
         }
     }
 
@@ -470,6 +470,18 @@
 
             Assert.IsFalse(_tween.isPlaying);
             Assert.AreEqual(20f, _tween.value);
+        }
+
+        [Test]
+        public void Sample_ProgressHalfWithEasing_HasMiddleValue()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+            _tween.progress = 0.5f;
+            _tween.easing = Easing.QuadraticIn;
+            _tween.Sample();
+
+            Assert.AreEqual(12.5f, _tween.value);
         }
     }
 }
