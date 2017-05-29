@@ -3,51 +3,22 @@
     using NUnit.Framework;
     using UnityEngine;
 
-    public sealed class TweenPositionTests
+    public sealed class TweenPositionTests : SetupTweenTests<TweenPosition>
     {
-        private TweenPosition _tweenPosition;
-
-        [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
-            GameObject go = new GameObject("TweenPosition");
-            _tweenPosition = go.AddComponent<TweenPosition>();
+            base.SetUp();
 
-            _tweenPosition.start = new Vector3(10, 0, 0);
-            _tweenPosition.end = new Vector3(20, 0, 0);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Object.DestroyImmediate(_tweenPosition.gameObject);
+            tween.start = new Vector3(10, 0, 0);
+            tween.end = new Vector3(20, 0, 0);
+            tween.progress = 0.5f;
         }
 
         [Test]
-        public void ValueAtStart()
+        public void WorldPosition()
         {
-            _tweenPosition.progress = 0f;
-            _tweenPosition.Apply();
-
-            Assert.AreEqual(new Vector3(10, 0, 0), _tweenPosition.transform.position);
-        }
-
-        [Test]
-        public void ValueAtEnd()
-        {
-            _tweenPosition.progress = 1f;
-            _tweenPosition.Apply();
-
-            Assert.AreEqual(new Vector3(20, 0, 0), _tweenPosition.transform.position);
-        }
-
-        [Test]
-        public void ValueAtMiddle()
-        {
-            _tweenPosition.progress = 0.5f;
-            _tweenPosition.Apply();
-
-            Assert.AreEqual(new Vector3(15, 0, 0), _tweenPosition.transform.position);
+            tween.Apply();
+            Assert.AreEqual(new Vector3(15, 0, 0), tween.transform.position);
         }
     }
 }
