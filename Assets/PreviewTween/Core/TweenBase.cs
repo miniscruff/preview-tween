@@ -5,7 +5,7 @@
 
     public enum PlayMode
     {
-        Manual,
+        None,
         Start,
         OnEnable
     }

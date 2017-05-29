@@ -118,9 +118,9 @@
         }
 
         [UnityTest]
-        public IEnumerator ManualPlayMode_OnlyPlaysIfWeCallPlay()
+        public IEnumerator NonePlayMode_OnlyPlaysIfWeCallPlay()
         {
-            _tween.playMode = PlayMode.Manual;
+            _tween.playMode = PlayMode.None;
             _tweenObject.SetActive(false);
 
             yield return null;
