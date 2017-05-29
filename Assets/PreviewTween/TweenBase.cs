@@ -27,11 +27,9 @@
         CustomCurve
     }
 
-    public abstract class TweenBase<T> : MonoBehaviour
+    public abstract class TweenBase : MonoBehaviour
     {
         // tween values
-        [SerializeField] private T _start;
-        [SerializeField] private T _end;
         private float _progress;
         private bool _isPlaying;
         private int _direction = 1;
@@ -43,18 +41,6 @@
         [SerializeField] private WrapMode _wrapMode;
         [SerializeField] private EasingMode _easingMode;
         [SerializeField] private AnimationCurve _customCurve;
-
-        public T start
-        {
-            get { return _start; }
-            set { _start = value; }
-        }
-
-        public T end
-        {
-            get { return _end; }
-            set { _end = value; }
-        }
 
         public float progress
         {

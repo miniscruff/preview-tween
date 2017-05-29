@@ -5,9 +5,24 @@
     using UnityEngine;
     using UnityEngine.TestTools;
 
-    public sealed class TestTween : TweenBase<float>
+    public sealed class TestTween : TweenBase
     {
+        private float _start;
+        private float _end;
         private float _value;
+
+        public float start
+        {
+            get { return _start; }
+            set { _start = value; }
+        }
+
+        public float end
+        {
+            get { return _end; }
+            set { _end = value; }
+        }
+
         public float value { get { return _value; } }
 
         protected override void UpdateValue(float smoothTime)
