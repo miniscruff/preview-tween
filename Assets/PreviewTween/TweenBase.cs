@@ -124,7 +124,7 @@
             Stop();
         }
 
-        public void Sample()
+        public void Apply()
         {
             UpdateValue(GetSmoothTime());
         }
@@ -136,7 +136,7 @@
                 return;
             }
 
-            Sample();
+            Apply();
             if (!_isPlaying)
             {
                 _isPlaying = true;
@@ -200,7 +200,7 @@
                 {
                     HandleWrapping();
                 }
-                Sample();
+                Apply();
             }
 
             _isPlaying = false;

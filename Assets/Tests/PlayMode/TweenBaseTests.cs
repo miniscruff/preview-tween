@@ -39,7 +39,7 @@
         {
             _tween.start = 10f;
             _tween.end = 25f;
-            _tween.Sample();
+            _tween.Apply();
 
             Assert.AreEqual(10f, _tween.value);
         }
@@ -50,7 +50,7 @@
             _tween.start = 10f;
             _tween.end = 20f;
             _tween.progress = 0.5f;
-            _tween.Sample();
+            _tween.Apply();
 
             Assert.AreEqual(15f, _tween.value);
         }
@@ -61,7 +61,7 @@
             _tween.start = 10f;
             _tween.end = 25f;
             _tween.progress = 1f;
-            _tween.Sample();
+            _tween.Apply();
 
             Assert.AreEqual(25f, _tween.value);
         }
@@ -479,7 +479,7 @@
             _tween.end = 20f;
             _tween.progress = 0.5f;
             _tween.easingMode = EasingMode.QuadraticIn;
-            _tween.Sample();
+            _tween.Apply();
 
             Assert.AreEqual(12.5f, _tween.value);
         }
@@ -496,7 +496,7 @@
 
             _tween.easingMode = EasingMode.CustomCurve;
             _tween.customCurve = curve;
-            _tween.Sample();
+            _tween.Apply();
 
             Assert.AreEqual(curve.Evaluate(0.6f), _tween.value);
         }
@@ -510,19 +510,19 @@
             _tween.progress = progress;
 
             _tween.easingMode = EasingMode.Linear;
-            _tween.Sample();
+            _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Linear(progress), _tween.value));
 
             _tween.easingMode = EasingMode.QuadraticIn;
-            _tween.Sample();
+            _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.QuadraticIn(progress), _tween.value));
 
             _tween.easingMode = EasingMode.QuadraticOut;
-            _tween.Sample();
+            _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.QuadraticOut(progress), _tween.value));
 
             _tween.easingMode = EasingMode.QuadraticInOut;
-            _tween.Sample();
+            _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.QuadraticInOut(progress), _tween.value));
         }
     }
