@@ -84,9 +84,24 @@
             _tween.end = 20f;
 
             _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
             yield return new WaitForSeconds(1f);
 
+            Assert.IsFalse(_tween.isPlaying);
+
             Assert.AreEqual(20f, _tween.value);
+        }
+
+        [Test]
+        public void DisabledComponent_DoesntPlay()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.enabled = false;
+
+            _tween.Play();
+            Assert.IsFalse(_tween.isPlaying);
         }
 
         [UnityTest]
@@ -101,5 +116,157 @@
 
             Assert.AreEqual(20f, _tween.value);
         }
+
+        [UnityTest]
+        public IEnumerator ManualPlayMode_OnlyPlaysIfWeCallPlay()
+        {
+            _tween.playMode = PlayMode.Manual;
+            _tweenObject.SetActive(false);
+
+            yield return null;
+            Assert.IsFalse(_tween.isPlaying);
+
+            yield return null;
+            _tweenObject.SetActive(true);
+
+            yield return null;
+            Assert.IsFalse(_tween.isPlaying);
+
+            yield return null;
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+        }
+
+        [UnityTest]
+        public IEnumerator StartPlayMode_PlaysImmediately()
+        {
+            // teardown and rebuild our game object so it starts off
+            // this is cause we need start to be called AFTER we have changed a setting
+            TearDown();
+
+            _tweenObject = new GameObject("Tween");
+            _tweenObject.SetActive(false);
+
+            _tween = _tweenObject.AddComponent<TestTween>();
+            _tween.playMode = PlayMode.Start;
+
+            // check to make sure we dont start until we are turned on
+            yield return null;
+            Assert.IsFalse(_tween.isPlaying);
+
+            yield return null;
+            _tweenObject.SetActive(true);
+
+            yield return null;
+            Assert.IsTrue(_tween.isPlaying);
+        }
+
+        [UnityTest]
+        public IEnumerator OnEnablePlayMode_PlaysIfWeAreTurnedOn()
+        {
+            _tween.playMode = PlayMode.OnEnable;
+
+            yield return null;
+            Assert.IsFalse(_tween.isPlaying);
+
+            _tweenObject.SetActive(false);
+            _tweenObject.SetActive(true);
+
+            yield return null;
+            Assert.IsTrue(_tween.isPlaying);
+        }
+
+        [UnityTest]
+        public IEnumerator Stop_PreventsAnyMoreProgress()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.5f);
+
+            // stop the tween halfway through and check our values
+            _tween.Stop();
+            yield return new WaitForSeconds(0.5f);
+
+            // we wont be exact due to coroutines and editor stuff
+            Assert.LessOrEqual(_tween.progress, 0.55f);
+            // do the same lerp we would normally do to make sure it was updated with the exact value
+            Assert.AreEqual(Mathf.Lerp(10f, 20f, _tween.progress), _tween.value);
+            Assert.IsFalse(_tween.isPlaying);
+
+            // go back to playing for the remainder
+            _tween.Play();
+
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsFalse(_tween.isPlaying);
+            Assert.AreEqual(20f, _tween.value);
+        }
+
+        [UnityTest]
+        public IEnumerator DisablingComponent_StopsTween()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.5f);
+
+            // disable the tween halfway through and check our values
+            _tween.enabled = false;
+            yield return new WaitForSeconds(0.5f);
+
+            // we wont be exact due to coroutines and editor stuff
+            Assert.LessOrEqual(_tween.progress, 0.55f);
+            // do the same lerp we would normally do to make sure it was updated with the exact value
+            Assert.AreEqual(Mathf.Lerp(10f, 20f, _tween.progress), _tween.value);
+            Assert.IsFalse(_tween.isPlaying);
+
+            // go back to playing for the remainder
+            _tween.enabled = true;
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsFalse(_tween.isPlaying);
+            Assert.AreEqual(20f, _tween.value);
+        }
+
+        [UnityTest]
+        public IEnumerator DisablingObject_StopsTween()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.5f);
+
+            // disable the tween halfway through and check our values
+            _tweenObject.SetActive(false);
+            yield return new WaitForSeconds(0.5f);
+
+            // we wont be exact due to coroutines and editor stuff
+            Assert.LessOrEqual(_tween.progress, 0.55f);
+            // do the same lerp we would normally do to make sure it was updated with the exact value
+            Assert.AreEqual(Mathf.Lerp(10f, 20f, _tween.progress), _tween.value);
+            Assert.IsFalse(_tween.isPlaying);
+
+            // go back to playing for the remainder
+            _tweenObject.SetActive(true);
+            _tween.Play();
+
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsFalse(_tween.isPlaying);
+            Assert.AreEqual(20f, _tween.value);
+        }
+
+        // test pausing
+        // test stopping
     }
 }
