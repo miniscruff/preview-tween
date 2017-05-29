@@ -17,10 +17,10 @@
                 filterMode = FilterMode.Point,
             };
 
-            for (int x = 0; x < width; x++)
+            for (float x = 0; x < width; x += 0.1f)
             {
-                int y = Mathf.RoundToInt(easingFunc((float)x / width) * 100) + height / 2;
-                texture.SetPixel(x, y, Color.green);
+                int y = Mathf.RoundToInt(easingFunc(x / width) * 100) + height / 2;
+                texture.SetPixel((int)x, y, Color.black);
             }
 
             byte[] pngBytes = texture.EncodeToPNG();
