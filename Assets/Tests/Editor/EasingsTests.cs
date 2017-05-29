@@ -9,18 +9,42 @@
     {
         private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath)
         {
-            const int width = 100;
-            const int height = 100;
+            CompareEasingToCache(easingFunc, filePath, 100, 0);
+        }
 
-            Texture2D texture = new Texture2D(width, height * 2, TextureFormat.RGBA32, false)
+        private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath, int height)
+        {
+            CompareEasingToCache(easingFunc, filePath, height, 0);
+        }
+
+        private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath, int height, int startingHeight)
+        {
+            const int width = 100;
+            const int width_buffer = 5;
+
+            // we need to subtract 1 so that a value of 1 on our easing is height - 1 on our texture
+            float lerpHeight = height - startingHeight - 1f;
+
+            // add a few pixels of width so we can use a value of 1 and not go out of range
+            Texture2D texture = new Texture2D(width + width_buffer * 2, height, TextureFormat.RGBA32, false)
             {
-                filterMode = FilterMode.Point,
+                filterMode = FilterMode.Point
             };
 
-            for (float x = 0; x < width; x += 0.1f)
+            for (float x = 0; x <= width; x += 0.25f)
             {
-                int y = Mathf.RoundToInt(easingFunc(x / width) * 100) + height / 2;
-                texture.SetPixel((int)x, y, Color.black);
+                float progress = x / width;
+                float factor = easingFunc(progress);
+
+                // our easing function should always be between 0 and 1
+                Assert.IsTrue(factor >= 0f);
+                Assert.IsTrue(factor <= 1f);
+
+                int y = Mathf.RoundToInt(Mathf.Lerp(0f, lerpHeight, factor) + startingHeight);
+                Assert.IsTrue(y < height);
+
+                // set the value to black on our texture
+                texture.SetPixel((int)x + width_buffer, y, Color.black);
             }
 
             byte[] pngBytes = texture.EncodeToPNG();
