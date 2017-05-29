@@ -112,8 +112,24 @@
                 return;
             }
 
-            _isPlaying = true;
-            StartCoroutine(RunTween());
+            Sample();
+            if (!_isPlaying)
+            {
+                _isPlaying = true;
+                StartCoroutine(RunTween());
+            }
+        }
+
+        public void Replay()
+        {
+            if (!CanPlay())
+            {
+                return;
+            }
+
+            _progress = 0f;
+            _direction = 1;
+            Play();
         }
 
         public void Toggle()
@@ -146,9 +162,6 @@
 
         private IEnumerator RunTween()
         {
-            // sample before starting our loop as well
-            Sample();
-
             if (_delay > 0f)
             {
                 yield return new WaitForSeconds(_delay);

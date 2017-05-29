@@ -92,6 +92,27 @@
             Assert.AreEqual(20f, _tween.value);
         }
 
+        [UnityTest]
+        public IEnumerator Play_CallingMoreThanOnce_DoesntEndFaster()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.Play();
+            _tween.Play();
+            _tween.Play();
+            _tween.Play();
+
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.5f);
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.5f);
+
+            Assert.IsFalse(_tween.isPlaying);
+
+            Assert.AreEqual(20f, _tween.value);
+        }
+
         [Test]
         public void DisabledComponent_DoesntPlay()
         {
@@ -386,7 +407,7 @@
         }
 
         [UnityTest]
-        public IEnumerator DoubleToggle_GoesToEnd()
+        public IEnumerator Toggle_DoubleCall_GoesToEnd()
         {
             _tween.start = 10f;
             _tween.end = 20f;
@@ -401,6 +422,53 @@
 
             Assert.IsFalse(_tween.isPlaying);
 
+            Assert.AreEqual(20f, _tween.value);
+        }
+
+        [UnityTest]
+        public IEnumerator Replay_StartsOverAfterDone()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+            _tween.duration = 0.25f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(_tween.duration);
+
+            Assert.IsFalse(_tween.isPlaying);
+            Assert.AreEqual(20f, _tween.value);
+
+            // now replay it
+            _tween.Replay();
+            Assert.IsTrue(_tween.isPlaying);
+            Assert.AreEqual(10f, _tween.value);
+
+            yield return new WaitForSeconds(1f);
+
+            Assert.IsFalse(_tween.isPlaying);
+            Assert.AreEqual(20f, _tween.value);
+        }
+
+        [UnityTest]
+        public IEnumerator Replay_StartsOverInMiddle()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+            _tween.duration = 0.25f;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(_tween.duration / 2f);
+
+            // now replay it
+            _tween.Replay();
+            Assert.IsTrue(_tween.isPlaying);
+            Assert.AreEqual(10f, _tween.value);
+
+            yield return new WaitForSeconds(_tween.duration);
+
+            Assert.IsFalse(_tween.isPlaying);
             Assert.AreEqual(20f, _tween.value);
         }
     }
