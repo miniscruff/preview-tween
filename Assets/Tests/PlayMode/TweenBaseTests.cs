@@ -478,10 +478,52 @@
             _tween.start = 10f;
             _tween.end = 20f;
             _tween.progress = 0.5f;
-            _tween.easing = Easing.QuadraticIn;
+            _tween.easingMode = EasingMode.QuadraticIn;
             _tween.Sample();
 
             Assert.AreEqual(12.5f, _tween.value);
+        }
+
+        [Test]
+        public void Curve_SettingEasingToCustomUsesCurve()
+        {
+            AnimationCurve curve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            curve.AddKey(0.25f, 0.4f); // add a random key so its not a simple ease in out
+
+            _tween.start = 0f;
+            _tween.end = 1f;
+            _tween.progress = 0.6f;
+
+            _tween.easingMode = EasingMode.CustomCurve;
+            _tween.customCurve = curve;
+            _tween.Sample();
+
+            Assert.AreEqual(curve.Evaluate(0.6f), _tween.value);
+        }
+
+        [Test]
+        public void CheckAllEasings()
+        {
+            const float progress = 0.25f;
+            _tween.start = 0f;
+            _tween.end = 1f;
+            _tween.progress = progress;
+
+            _tween.easingMode = EasingMode.Linear;
+            _tween.Sample();
+            Assert.IsTrue(Mathf.Approximately(Easings.Linear(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuadraticIn;
+            _tween.Sample();
+            Assert.IsTrue(Mathf.Approximately(Easings.QuadraticIn(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuadraticOut;
+            _tween.Sample();
+            Assert.IsTrue(Mathf.Approximately(Easings.QuadraticOut(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuadraticInOut;
+            _tween.Sample();
+            Assert.IsTrue(Mathf.Approximately(Easings.QuadraticInOut(progress), _tween.value));
         }
     }
 }

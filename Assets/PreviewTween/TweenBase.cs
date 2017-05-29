@@ -18,6 +18,15 @@
         PingPong
     }
 
+    public enum EasingMode
+    {
+        Linear,
+        QuadraticIn,
+        QuadraticOut,
+        QuadraticInOut,
+        CustomCurve
+    }
+
     public abstract class TweenBase<T> : MonoBehaviour
     {
         // tween values
@@ -32,7 +41,8 @@
         [SerializeField] private float _duration = 1f;
         [SerializeField] private PlayMode _playMode;
         [SerializeField] private WrapMode _wrapMode;
-        [SerializeField] private Easing _easing;
+        [SerializeField] private EasingMode _easingMode;
+        [SerializeField] private AnimationCurve _customCurve;
 
         public T start
         {
@@ -81,10 +91,16 @@
             set { _wrapMode = value; }
         }
 
-        public Easing easing
+        public EasingMode easingMode
         {
-            get { return _easing; }
-            set { _easing = value; }
+            get { return _easingMode; }
+            set { _easingMode = value; }
+        }
+
+        public AnimationCurve customCurve
+        {
+            get { return _customCurve; }
+            set { _customCurve = value; }
         }
 
         private void Start()
@@ -225,18 +241,20 @@
 
         private float GetSmoothTime()
         {
-            switch (_easing)
+            switch (_easingMode)
             {
-                case Easing.Linear:
+                case EasingMode.Linear:
                     return Easings.Linear(_progress);
-                case Easing.QuadraticIn:
+                case EasingMode.QuadraticIn:
                     return Easings.QuadraticIn(_progress);
-                case Easing.QuadraticOut:
+                case EasingMode.QuadraticOut:
                     return Easings.QuadraticOut(_progress);
-                case Easing.QuadraticInOut:
+                case EasingMode.QuadraticInOut:
                     return Easings.QuadraticInOut(_progress);
+                case EasingMode.CustomCurve:
+                    return _customCurve.Evaluate(_progress);
             }
-            throw new NotImplementedException("Easing [" + _easing + "] not yet implemented");
+            throw new NotImplementedException("Easing [" + _easingMode + "] not yet implemented");
         }
 
         protected abstract void UpdateValue(float smoothTime);

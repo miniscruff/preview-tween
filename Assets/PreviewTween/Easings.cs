@@ -1,13 +1,5 @@
 ﻿namespace PreviewTween
 {
-    public enum Easing
-    {
-        Linear,
-        QuadraticIn,
-        QuadraticOut,
-        QuadraticInOut
-    }
-
     public static class Easings
     {
         public static float Linear(float time)
