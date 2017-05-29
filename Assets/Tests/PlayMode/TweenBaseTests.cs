@@ -266,7 +266,83 @@
             Assert.AreEqual(20f, _tween.value);
         }
 
-        // test pausing
-        // test stopping
+        [UnityTest]
+        public IEnumerator PlayWithLooping_RestartsProgressWhenCompleting()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+            _tween.wrapMode = WrapMode.Loop;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+
+            float lastProgress = 0f;
+            while (true)
+            {
+                float newProgress = _tween.progress;
+                if (newProgress > 1f)
+                {
+                    Assert.Fail();
+                }
+                if (newProgress < lastProgress)
+                {
+                    Assert.IsTrue(newProgress <= 0.1f);
+                    break;
+                }
+                lastProgress = newProgress;
+                yield return null;
+            }
+
+            Assert.IsTrue(_tween.isPlaying);
+        }
+
+        [UnityTest]
+        public IEnumerator PlayWithPingPong_BouncesAtOneAndZero()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+            _tween.wrapMode = WrapMode.PingPong;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+
+            float lastProgress = 0f;
+            // first check we start to go back down
+            while (true)
+            {
+                float newProgress = _tween.progress;
+                if (newProgress > 1f)
+                {
+                    Assert.Fail();
+                }
+                if (newProgress < lastProgress)
+                {
+                    Assert.IsTrue(newProgress >= 0.9f);
+                    break;
+                }
+                lastProgress = newProgress;
+                yield return null;
+            }
+
+            // then check we go back up
+            lastProgress = 1f;
+            while (true)
+            {
+                float newProgress = _tween.progress;
+                if (newProgress < 0f)
+                {
+                    Assert.Fail();
+                }
+                if (newProgress > lastProgress)
+                {
+                    Assert.IsTrue(newProgress <= 0.1f);
+                    break;
+                }
+                lastProgress = newProgress;
+                yield return null;
+            }
+
+            Assert.IsTrue(_tween.isPlaying);
+        }
     }
 }

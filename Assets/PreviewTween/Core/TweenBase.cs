@@ -10,17 +10,26 @@
         OnEnable
     }
 
+    public enum WrapMode
+    {
+        Once,
+        Loop,
+        PingPong
+    }
+
     public abstract class TweenBase<T> : MonoBehaviour
     {
         // tween values
         [SerializeField] private T _start;
         [SerializeField] private T _end;
         private float _progress;
-        [SerializeField] private float _duration = 1f;
         private bool _isPlaying;
+        private int _pingPongDirection = 1;
 
         // settings
+        [SerializeField] private float _duration = 1f;
         [SerializeField] private PlayMode _playMode;
+        [SerializeField] private WrapMode _wrapMode;
 
         public T start
         {
@@ -34,12 +43,6 @@
             set { _end = value; }
         }
 
-        public float duration
-        {
-            get { return _duration; }
-            set { _duration = value; }
-        }
-
         public float progress
         {
             get { return _progress; }
@@ -51,10 +54,22 @@
             get { return _isPlaying; }
         }
 
+        public float duration
+        {
+            get { return _duration; }
+            set { _duration = value; }
+        }
+
         public PlayMode playMode
         {
             get { return _playMode; }
             set { _playMode = value; }
+        }
+
+        public WrapMode wrapMode
+        {
+            get { return _wrapMode; }
+            set { _wrapMode = value; }
         }
 
         private void Start()
@@ -105,11 +120,36 @@
             // sample before starting our loop as well
             Sample();
 
-            while (_isPlaying && (_progress < 1f))
+            while (_isPlaying)
             {
+                if (_progress >= 1f && wrapMode == WrapMode.Once)
+                {
+                    break;
+                }
                 yield return null;
 
-                _progress = Mathf.Clamp01(_progress + Time.deltaTime / _duration);
+                if (wrapMode == WrapMode.Once)
+                {
+                    _progress = Mathf.Clamp01(_progress + Time.deltaTime / _duration);
+                }
+                else if (wrapMode == WrapMode.Loop)
+                {
+                    _progress = (_progress + Time.deltaTime / _duration) % 1f;
+                }
+                else if (wrapMode == WrapMode.PingPong)
+                {
+                    _progress += Time.deltaTime / _duration * _pingPongDirection;
+                    if (_progress < 0f)
+                    {
+                        _progress *= -1;
+                        _pingPongDirection = 1;
+                    }
+                    else if(_progress > 1f)
+                    {
+                        _progress = 2f - _progress;
+                        _pingPongDirection = -1;
+                    }
+                }
                 Sample();
             }
 
