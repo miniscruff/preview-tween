@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using NUnit.Framework;
+    using UnityEditor;
     using UnityEngine;
 
     public sealed class EasingsTests
@@ -48,18 +49,29 @@
             }
 
             byte[] pngBytes = texture.EncodeToPNG();
-            string fullPath = "Assets/Tests/Editor/EasingComparisons/" + filePath + ".png";
-            if (File.Exists(fullPath))
+            Texture2D existingTexture = Resources.Load<Texture2D>("Easings/" + filePath);
+            if (existingTexture != null)
             {
-                byte[] existingImage = File.ReadAllBytes(fullPath);
-                CollectionAssert.AreEqual(existingImage, pngBytes);
+                byte[] existingTextureBytes = existingTexture.EncodeToPNG();
+                CollectionAssert.AreEqual(existingTextureBytes, pngBytes);
             }
             else
             {
                 // if we dont have the image already, this will create it
                 // it is up to the creator to verify the image is accurate after making it
                 // if its not accurate, edit the algorithm and delete the image to remake the comparison image
+                string fullPath = "Assets/PreviewTween/Editor/Resources/Easings/" + filePath + ".png";
                 File.WriteAllBytes(fullPath, pngBytes);
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                // Note: The path is hard coded so if you move the preview tween folder inside another one it will fail currently
+
+                // we have to setup our import settings so we can use it for our easings dialog and to read it in future tests
+                TextureImporter textureImporter = AssetImporter.GetAtPath(fullPath) as TextureImporter;
+                textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
+                textureImporter.isReadable = true;
+                textureImporter.mipmapEnabled = false;
+                textureImporter.npotScale = TextureImporterNPOTScale.None;
+                textureImporter.SaveAndReimport();
             }
         }
 
