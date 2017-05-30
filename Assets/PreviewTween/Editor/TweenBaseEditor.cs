@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using UnityEditor;
+    using UnityEditor.AnimatedValues;
 
     [CustomEditor(typeof(TweenBase), true)]
     public sealed class TweenBaseEditor : Editor
@@ -62,12 +63,29 @@
 
             EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
+
             EditorGUILayout.PropertyField(_delayProperty);
+            if (_delayProperty.floatValue < 0)
+            {
+                _delayProperty.floatValue = 0f;
+            }
+
             EditorGUILayout.PropertyField(_durationProperty);
+            if (_durationProperty.floatValue < 0.1f)
+            {
+                _durationProperty.floatValue = 0.1f;
+            }
+
             EditorGUILayout.PropertyField(_playModeProperty);
             EditorGUILayout.PropertyField(_wrapModeProperty);
             EditorGUILayout.PropertyField(_easingModeProperty);
-            EditorGUILayout.PropertyField(_customCurveProperty);
+
+            EasingMode easingMode = (EasingMode)_easingModeProperty.enumValueIndex;
+            if (easingMode == EasingMode.CustomCurve)
+            {
+                EditorGUILayout.PropertyField(_customCurveProperty);
+            }
+
             EditorGUI.indentLevel--;
             EditorGUILayout.Separator();
 

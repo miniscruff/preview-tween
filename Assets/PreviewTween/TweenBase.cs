@@ -41,7 +41,7 @@
         [SerializeField] private PlayMode _playMode;
         [SerializeField] private WrapMode _wrapMode;
         [SerializeField] private EasingMode _easingMode;
-        [SerializeField] private AnimationCurve _customCurve;
+        [SerializeField] private AnimationCurve _customCurve = AnimationCurve.Linear(0, 0, 1, 1);
         [SerializeField] private UnityEvent _onComplete = new UnityEvent();
 
         public float progress
