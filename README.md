@@ -1,2 +1,2 @@
-# preview-tween
-Designer friendly tween system built in unity that is based around giving non-programmers previews of what they are doing.
+# Preview Tween
+Designer friendly tween system built in unity that is based around giving showing previews of what they are doing. Providing a quick and easy way to make really clean tweens.
