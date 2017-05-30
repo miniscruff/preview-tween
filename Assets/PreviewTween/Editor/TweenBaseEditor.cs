@@ -29,6 +29,18 @@
         private TweenBase _tween;
         private PreviewMode _mode;
 
+        private GUIStyle _leftStyle;
+        private GUIStyle _middleStyle;
+        private GUIStyle _rightStyle;
+        private GUIStyle _thumbStyle;
+
+        private GUIContent _recordStartNormal;
+        private GUIContent _recordStartOn;
+
+        // Icons are still a work in progress
+        //private GUIContent _playNormal;
+        //private GUIContent _playOn;
+
         private void OnEnable()
         {
             _tween = (TweenBase)target;
@@ -65,8 +77,16 @@
             }
         }
 
+        public override bool RequiresConstantRepaint()
+        {
+            return true;
+        }
+
         public override void OnInspectorGUI()
         {
+            LoadStyles();
+            LoadTextures();
+
             serializedObject.Update();
 
             DrawCustom();
@@ -74,6 +94,32 @@
             DrawSettings();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void LoadStyles()
+        {
+            // if any are not null, we are fine
+            if (_leftStyle != null)
+            {
+                return;
+            }
+
+            _leftStyle = GUI.skin.FindStyle("LargeButtonLeft");
+            _middleStyle = GUI.skin.FindStyle("LargeButtonMid");
+            _rightStyle = GUI.skin.FindStyle("LargeButtonRight");
+            _thumbStyle = GUI.skin.FindStyle("MeTransPlayhead");
+        }
+
+        private void LoadTextures()
+        {
+            // tried using build in icons, doesnt seem to want to work
+            //if (_playNormal != null)
+            //{
+            //    return;
+            //}
+
+            //_playNormal = new GUIContent(EditorGUIUtility.Load("PlayButton") as Texture);
+            //_playOn = new GUIContent(EditorGUIUtility.Load("PlayButton On") as Texture);
         }
 
         private void DrawCustom()
@@ -87,27 +133,9 @@
 
         private void DrawPreview()
         {
-            GUIStyle leftStyle = GUI.skin.FindStyle("LargeButtonLeft");
-            GUIStyle middleStyle = GUI.skin.FindStyle("LargeButtonMid");
-            GUIStyle rightStyle = GUI.skin.FindStyle("LargeButtonRight");
-            GUIStyle progressBarStyle = GUI.skin.FindStyle("ProgressBarBack");
-            GUIStyle thumbStyle = GUI.skin.FindStyle("MeTransPlayhead");
-
-            EditorGUILayout.BeginHorizontal();
-
-            DrawRecordStartButton(leftStyle);
-            DrawRewindButton(middleStyle);
-            DrawPlayButton(middleStyle);
-            DrawPauseButton(middleStyle);
-            DrawRecordEndButton(rightStyle);
-
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Separator();
             EditorGUI.BeginDisabledGroup(_mode != PreviewMode.None);
-            //float newValue = EditorGUILayout.Slider(_tween.progress, 0f, 1f);
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(40));
-            float newValue = PreviewProgress(progressRect, _tween.progress, progressBarStyle, thumbStyle);
+            float newValue = PreviewProgress(progressRect, _tween.progress, _thumbStyle);
             if (!Mathf.Approximately(newValue, _tween.progress))
             {
                 _tween.progress = newValue;
@@ -115,11 +143,23 @@
             }
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Separator();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            DrawRecordStartButton();
+            DrawRewindButton();
+            DrawPlayButton();
+            DrawPauseButton();
+            DrawRecordEndButton();
+
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
         }
 
-        private void DrawRecordStartButton(GUIStyle leftStyle)
+        private void DrawRecordStartButton()
         {
-            if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", leftStyle, GUILayout.Width(60)))
+            if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", _leftStyle, GUILayout.Width(60)))
             {
                 if (_mode == PreviewMode.RecordStart)
                 {
@@ -135,9 +175,9 @@
             }
         }
 
-        private void DrawRecordEndButton(GUIStyle rightStyle)
+        private void DrawRecordEndButton()
         {
-            if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", rightStyle, GUILayout.Width(60)))
+            if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", _rightStyle, GUILayout.Width(60)))
             {
                 if (_mode == PreviewMode.RecordEnd)
                 {
@@ -163,12 +203,12 @@
             _tween.RecordEnd();
         }
 
-        private void DrawRewindButton(GUIStyle middleStyle)
+        private void DrawRewindButton()
         {
             bool shouldBeActive = _tween.progress > 0 && _mode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            if (GUILayout.Button("Re", middleStyle, GUILayout.Width(60)))
+            if (GUILayout.Button("Re", _middleStyle, GUILayout.Width(60)))
             {
                 _tween.progress = 0f;
                 _tween.direction = 1;
@@ -178,10 +218,10 @@
             EditorGUI.EndDisabledGroup();
         }
 
-        private void DrawPlayButton(GUIStyle middleStyle)
+        private void DrawPlayButton()
         {
             bool before = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
-            bool after = GUILayout.Toggle(before, "Pl", middleStyle, GUILayout.Width(60));
+            bool after = GUILayout.Toggle(before, "Pl", _middleStyle, GUILayout.Width(50));
             if (before != after)
             {
                 _mode = after ? PreviewMode.Playing : PreviewMode.None;
@@ -209,13 +249,13 @@
             }
         }
 
-        private void DrawPauseButton(GUIStyle middleStyle)
+        private void DrawPauseButton()
         {
             bool shouldBeActive = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
             bool before = _mode == PreviewMode.Paused;
-            bool after = GUILayout.Toggle(before, "Pa", middleStyle, GUILayout.Width(60));
+            bool after = GUILayout.Toggle(before, "Pa", _middleStyle, GUILayout.Width(60));
             if (before != after)
             {
                 _mode = after ? PreviewMode.Paused : PreviewMode.Playing;
@@ -223,7 +263,7 @@
             EditorGUI.EndDisabledGroup();
         }
 
-        private static float PreviewProgress(Rect controlRect, float value, GUIStyle barStyle, GUIStyle thumbStyle)
+        private static float PreviewProgress(Rect controlRect, float value, GUIStyle thumbStyle)
         {
             Texture2D thumbTexture = thumbStyle.normal.background;
 
@@ -241,8 +281,9 @@
             {
                 case EventType.Repaint:
                     {
-                        // Draw the texture from the GUIStyle
-                        GUI.DrawTexture(backgroundRect, barStyle.normal.background, ScaleMode.StretchToFill);
+                        // There is a visual issue with the progress bar that makes it so a value of 0
+                        // is visually to off the bar on the left and looks bad, but if we keep it at 0.01 its fine
+                        EditorGUI.ProgressBar(backgroundRect, Mathf.Max(value, 0.01f), "");
                         break;
                     }
                 case EventType.MouseDown:
