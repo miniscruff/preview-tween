@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using UnityEngine;
+    using UnityEngine.Events;
 
     public enum PlayMode
     {
@@ -41,6 +42,7 @@
         [SerializeField] private WrapMode _wrapMode;
         [SerializeField] private EasingMode _easingMode;
         [SerializeField] private AnimationCurve _customCurve;
+        [SerializeField] private UnityEvent _onComplete = new UnityEvent();
 
         public float progress
         {
@@ -87,6 +89,13 @@
         {
             get { return _customCurve; }
             set { _customCurve = value; }
+        }
+
+        // Kinda lame but UnityEvents arent considered events so resharper thinks it should just be complete
+        // ReSharper disable once InconsistentNaming
+        public UnityEvent onComplete
+        {
+            get { return _onComplete; }
         }
 
         private void Start()
@@ -185,8 +194,15 @@
                 if (_progress <= 0f || _progress >= 1f)
                 {
                     HandleWrapping();
+                    Apply();
+
+                    // we want to call our onComplete AFTER we apply
+                    _onComplete.Invoke();
                 }
-                Apply();
+                else
+                {
+                    Apply();
+                }
             }
 
             _isPlaying = false;

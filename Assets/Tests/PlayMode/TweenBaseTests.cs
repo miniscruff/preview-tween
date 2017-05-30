@@ -499,6 +499,35 @@
             Assert.AreEqual(12.5f, _tween.value);
         }
 
+        [UnityTest]
+        public IEnumerator Play_ExecutesEventOnComplete()
+        {
+            _tween.duration = 0.25f;
+
+            bool wasCalled = false;
+            _tween.onComplete.AddListener(() => wasCalled = true);
+
+            _tween.Play();
+            yield return new WaitForSeconds(_tween.duration);
+
+            Assert.IsTrue(wasCalled);
+        }
+
+        [UnityTest]
+        public IEnumerator Play_OnCompleteCalledForEachLoop()
+        {
+            _tween.duration = 0.25f;
+            _tween.wrapMode = WrapMode.Loop;
+
+            int calledCount = 0;
+            _tween.onComplete.AddListener(() => calledCount++);
+
+            _tween.Play();
+            yield return new WaitForSeconds(_tween.duration * 5);
+
+            Assert.AreEqual(5, calledCount);
+        }
+
         [Test]
         public void Curve_SettingEasingToCustomUsesCurve()
         {
