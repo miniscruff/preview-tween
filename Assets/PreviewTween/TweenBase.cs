@@ -55,6 +55,12 @@
             get { return _isPlaying; }
         }
 
+        public int direction
+        {
+            get { return _direction; }
+            set { _direction = value; }
+        }
+
         public float delay
         {
             get { return _delay; }
@@ -190,22 +196,27 @@
             {
                 yield return null;
 
-                _progress += Time.deltaTime / _duration * _direction;
-                if (_progress <= 0f || _progress >= 1f)
-                {
-                    HandleWrapping();
-                    Apply();
-
-                    // we want to call our onComplete AFTER we apply
-                    _onComplete.Invoke();
-                }
-                else
-                {
-                    Apply();
-                }
+                Tick(Time.deltaTime);
             }
 
             _isPlaying = false;
+        }
+
+        public void Tick(float deltaTime)
+        {
+            _progress += deltaTime / _duration * _direction;
+            if (_progress <= 0f || _progress >= 1f)
+            {
+                HandleWrapping();
+                Apply();
+
+                // we want to call our onComplete AFTER we apply
+                _onComplete.Invoke();
+            }
+            else
+            {
+                Apply();
+            }
         }
 
         private void HandleWrapping()

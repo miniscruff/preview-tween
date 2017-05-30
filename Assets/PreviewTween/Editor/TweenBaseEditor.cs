@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using UnityEditor;
-    using UnityEditor.AnimatedValues;
+    using UnityEngine;
 
     [CustomEditor(typeof(TweenBase), true)]
     public sealed class TweenBaseEditor : Editor
@@ -17,8 +17,13 @@
         private SerializedProperty _customCurveProperty;
         private SerializedProperty _onCompleteProperty;
 
+        private TweenBase _tween;
+        private bool _isPlaying;
+
         private void OnEnable()
         {
+            _tween = (TweenBase)target;
+
             _delayProperty = serializedObject.FindProperty("_delay");
             _durationProperty = serializedObject.FindProperty("_duration");
             _playModeProperty = serializedObject.FindProperty("_playMode");
@@ -61,6 +66,27 @@
             }
             EditorGUILayout.Separator();
 
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(_isPlaying ? "Stop" : "Play"))
+            {
+                _tween.progress = 0f;
+                _tween.direction = 1;
+                _tween.Apply();
+
+                if (_isPlaying)
+                {
+                    EditorApplication.update -= UpdatePreview;
+                }
+                else
+                {
+                    EditorApplication.update += UpdatePreview;
+                }
+                _isPlaying = !_isPlaying;
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Slider(_tween.progress, 0f, 1f);
+
             EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
 
@@ -92,6 +118,20 @@
             EditorGUILayout.PropertyField(_onCompleteProperty);
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void UpdatePreview()
+        {
+            // keep our delta time to 30fps as unity likes to have a massive delay for our first frame
+            float dt = Mathf.Min(Time.deltaTime, 0.033f);
+            _tween.Tick(dt);
+
+            if (_tween.progress >= 1f && _tween.wrapMode == WrapMode.Once)
+            {
+                _isPlaying = false;
+                _tween.progress = 0f;
+                EditorApplication.update -= UpdatePreview;
+            }
         }
     }
 }
