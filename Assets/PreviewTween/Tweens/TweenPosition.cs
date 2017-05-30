@@ -19,6 +19,18 @@
             set { _end = value; }
         }
 
+#if UNITY_EDITOR
+        public override void RecordStart()
+        {
+            _start = transform.position;
+        }
+
+        public override void RecordEnd()
+        {
+            _end = transform.position;
+        }
+#endif
+
         protected override void UpdateValue(float smoothTime)
         {
             transform.position = Vector3.LerpUnclamped(_start, _end, smoothTime);

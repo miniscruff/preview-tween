@@ -270,6 +270,10 @@
             throw new NotImplementedException("Easing [" + _easingMode + "] not yet implemented");
         }
 
+#if UNITY_EDITOR
+        public abstract void RecordStart();
+        public abstract void RecordEnd();
+#endif
         protected abstract void UpdateValue(float smoothTime);
     }
 }

@@ -25,6 +25,16 @@
 
         public float value { get { return _value; } }
 
+        public override void RecordStart()
+        {
+            // Used by the editor so it doesnt matter here
+        }
+
+        public override void RecordEnd()
+        {
+            // Used by the editor so it doesnt matter here
+        }
+
         protected override void UpdateValue(float smoothTime)
         {
             _value = Mathf.LerpUnclamped(start, end, smoothTime);

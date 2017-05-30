@@ -4,6 +4,15 @@
     using UnityEditor;
     using UnityEngine;
 
+    public enum PreviewMode
+    {
+        None,
+        RecordStart,
+        RecordEnd,
+        Playing,
+        Paused
+    }
+
     [CustomEditor(typeof(TweenBase), true)]
     public sealed class TweenBaseEditor : Editor
     {
@@ -18,7 +27,7 @@
         private SerializedProperty _onCompleteProperty;
 
         private TweenBase _tween;
-        private bool _isPlaying;
+        private PreviewMode _mode;
 
         private void OnEnable()
         {
@@ -60,33 +69,190 @@
         {
             serializedObject.Update();
 
+            DrawCustom();
+            DrawPreview();
+            DrawSettings();
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawCustom()
+        {
             foreach (SerializedProperty custom in _customProperties)
             {
                 EditorGUILayout.PropertyField(custom);
             }
             EditorGUILayout.Separator();
+        }
+
+        private void DrawPreview()
+        {
+            GUIStyle leftStyle = GUI.skin.FindStyle("LargeButtonLeft");
+            GUIStyle middleStyle = GUI.skin.FindStyle("LargeButtonMid");
+            GUIStyle rightStyle = GUI.skin.FindStyle("LargeButtonRight");
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(_isPlaying ? "Stop" : "Play"))
+
+            DrawRecordStartButton(leftStyle);
+            DrawRewindButton(middleStyle);
+            DrawPlayButton(middleStyle);
+            DrawPauseButton(middleStyle);
+            DrawRecordEndButton(rightStyle);
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.BeginDisabledGroup(_mode != PreviewMode.None);
+            float newValue = EditorGUILayout.Slider(_tween.progress, 0f, 1f);
+            if (!Mathf.Approximately(newValue, _tween.progress))
+            {
+                _tween.progress = newValue;
+                _tween.Apply();
+            }
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void DrawRecordStartButton(GUIStyle leftStyle)
+        {
+            if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", leftStyle, GUILayout.Width(60)))
+            {
+                if (_mode == PreviewMode.RecordStart)
+                {
+                    _tween.progress = 0f;
+                    _tween.Apply();
+                    EditorApplication.update += UpdateRecordStart;
+                    EditorApplication.update -= UpdateRecordEnd;
+                }
+                else
+                {
+                    EditorApplication.update -= UpdateRecordStart;
+                }
+            }
+        }
+
+        private void DrawRecordEndButton(GUIStyle rightStyle)
+        {
+            if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", rightStyle, GUILayout.Width(60)))
+            {
+                if (_mode == PreviewMode.RecordEnd)
+                {
+                    _tween.progress = 1f;
+                    _tween.Apply();
+                    EditorApplication.update += UpdateRecordEnd;
+                    EditorApplication.update -= UpdateRecordStart;
+                }
+                else
+                {
+                    EditorApplication.update -= UpdateRecordEnd;
+                }
+            }
+        }
+
+        private void UpdateRecordStart()
+        {
+            _tween.RecordStart();
+        }
+
+        private void UpdateRecordEnd()
+        {
+            _tween.RecordEnd();
+        }
+
+        private void DrawRewindButton(GUIStyle middleStyle)
+        {
+            bool shouldBeActive = _tween.progress > 0 && _mode == PreviewMode.None;
+            EditorGUI.BeginDisabledGroup(!shouldBeActive);
+
+            if (GUILayout.Button("Re", middleStyle, GUILayout.Width(60)))
             {
                 _tween.progress = 0f;
                 _tween.direction = 1;
                 _tween.Apply();
+            }
 
-                if (_isPlaying)
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void DrawPlayButton(GUIStyle middleStyle)
+        {
+            bool before = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
+            bool after = GUILayout.Toggle(before, "Pl", middleStyle, GUILayout.Width(60));
+            if (before != after)
+            {
+                _mode = after ? PreviewMode.Playing : PreviewMode.None;
+
+                // reset our progress only if we are at the end in a wrap once tween
+                if (_tween.wrapMode == WrapMode.Once && _tween.progress >= 1f)
                 {
-                    EditorApplication.update -= UpdatePreview;
+                    _tween.progress = 0f;
                 }
-                else
+
+                _tween.direction = 1;
+                _tween.Apply();
+
+                EditorApplication.update -= UpdateRecordStart;
+                EditorApplication.update -= UpdateRecordEnd;
+
+                if (after)
                 {
                     EditorApplication.update += UpdatePreview;
                 }
-                _isPlaying = !_isPlaying;
+                else
+                {
+                    EditorApplication.update -= UpdatePreview;
+                }
             }
-            EditorGUILayout.EndHorizontal();
+        }
 
-            EditorGUILayout.Slider(_tween.progress, 0f, 1f);
+        private void DrawPauseButton(GUIStyle middleStyle)
+        {
+            bool shouldBeActive = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
+            EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
+            bool before = _mode == PreviewMode.Paused;
+            bool after = GUILayout.Toggle(before, "Pa", middleStyle, GUILayout.Width(60));
+            if (before != after)
+            {
+                _mode = after ? PreviewMode.Paused : PreviewMode.Playing;
+            }
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void UpdatePreview()
+        {
+            // if we are paused we dont want to do anything
+            if (_mode != PreviewMode.Playing)
+            {
+                return;
+            }
+
+            // keep our delta time to 30fps as unity likes to have a massive delay for our first frame
+            float dt = Mathf.Min(Time.deltaTime, 0.033f);
+            _tween.Tick(dt);
+
+            if (_tween.progress >= 1f && _tween.wrapMode == WrapMode.Once)
+            {
+                _mode = PreviewMode.None;
+                EditorApplication.update -= UpdatePreview;
+            }
+        }
+
+        private bool DrawRecordModeToggle(PreviewMode mode, PreviewMode otherRecord, string text, GUIStyle leftStyle, params GUILayoutOption[] options)
+        {
+            bool shouldBeActive = _mode == PreviewMode.None || _mode == mode || _mode == otherRecord;
+            EditorGUI.BeginDisabledGroup(!shouldBeActive);
+
+            bool before = _mode == mode;
+            bool after = GUILayout.Toggle(before, text, leftStyle, options);
+            if (before != after)
+            {
+                _mode = after ? mode : PreviewMode.None;
+            }
+            EditorGUI.EndDisabledGroup();
+            return before != after;
+        }
+
+        private void DrawSettings()
+        {
             EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
 
@@ -106,7 +272,7 @@
             EditorGUILayout.PropertyField(_wrapModeProperty);
             EditorGUILayout.PropertyField(_easingModeProperty);
 
-            EasingMode easingMode = (EasingMode)_easingModeProperty.enumValueIndex;
+            EasingMode easingMode = (EasingMode) _easingModeProperty.enumValueIndex;
             if (easingMode == EasingMode.CustomCurve)
             {
                 EditorGUILayout.PropertyField(_customCurveProperty);
@@ -116,22 +282,6 @@
             EditorGUILayout.Separator();
 
             EditorGUILayout.PropertyField(_onCompleteProperty);
-
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        private void UpdatePreview()
-        {
-            // keep our delta time to 30fps as unity likes to have a massive delay for our first frame
-            float dt = Mathf.Min(Time.deltaTime, 0.033f);
-            _tween.Tick(dt);
-
-            if (_tween.progress >= 1f && _tween.wrapMode == WrapMode.Once)
-            {
-                _isPlaying = false;
-                _tween.progress = 0f;
-                EditorApplication.update -= UpdatePreview;
-            }
         }
     }
 }
