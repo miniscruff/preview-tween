@@ -26,6 +26,7 @@
             {
                 filterMode = FilterMode.Point
             };
+            GenerateBaesTexture(texture, width, height, width_buffer, startingHeight);
 
             for (float x = 0; x <= width; x += 0.25f)
             {
@@ -40,7 +41,13 @@
                 Assert.IsTrue(y < height);
 
                 // set the value to black on our texture
-                texture.SetPixel((int)x + width_buffer, y, Color.black);
+                texture.SetPixel((int)x + width_buffer, y, Color.green);
+
+                // make it a double thick line
+                if (y > 0)
+                {
+                    texture.SetPixel((int)x + width_buffer, y - 1, Color.green);
+                }
             }
 
             byte[] pngBytes = texture.EncodeToPNG();
@@ -66,8 +73,27 @@
                 textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
                 textureImporter.isReadable = true;
                 textureImporter.mipmapEnabled = false;
+                textureImporter.alphaIsTransparency = true;
                 textureImporter.npotScale = TextureImporterNPOTScale.None;
                 textureImporter.SaveAndReimport();
+            }
+        }
+
+        private static void GenerateBaesTexture(Texture2D texture, int width, int height, int widthBuffer, int startingHeight)
+        {
+            for (int x = 0; x < width + widthBuffer * 2; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (y == startingHeight || y == height - startingHeight - 1 || x == widthBuffer || x == width + widthBuffer)
+                    {
+                        texture.SetPixel(x, y, Color.black);
+                    }
+                    else
+                    {
+                        texture.SetPixel(x, y, Color.clear);
+                    }
+                }
             }
         }
 
