@@ -13,11 +13,6 @@
             CompareEasingToCache(easingFunc, filePath, 100, 0);
         }
 
-        private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath, int height)
-        {
-            CompareEasingToCache(easingFunc, filePath, height, 0);
-        }
-
         private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath, int height, int startingHeight)
         {
             const int width = 100;
@@ -60,10 +55,11 @@
                 // if we dont have the image already, this will create it
                 // it is up to the creator to verify the image is accurate after making it
                 // if its not accurate, edit the algorithm and delete the image to remake the comparison image
-                string fullPath = "Assets/PreviewTween/Editor/Resources/Easings/" + filePath + ".png";
+
+                string easingsPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Easings/");
+                string fullPath = easingsPath + filePath + ".png";
                 File.WriteAllBytes(fullPath, pngBytes);
                 AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-                // Note: The path is hard coded so if you move the preview tween folder inside another one it will fail currently
 
                 // we have to setup our import settings so we can use it for our easings dialog and to read it in future tests
                 TextureImporter textureImporter = AssetImporter.GetAtPath(fullPath) as TextureImporter;
