@@ -27,8 +27,10 @@
         private SerializedProperty _customCurveProperty;
         private SerializedProperty _onCompleteProperty;
 
+        private Texture2D _easingIcon;
+
         private TweenBase _tween;
-        private PreviewMode _mode;
+        private PreviewMode _previewMode;
 
         private bool _cachedIsProSkin;
         private GUIStyle _leftStyle;
@@ -141,7 +143,7 @@
 
         private void DrawPreview()
         {
-            EditorGUI.BeginDisabledGroup(_mode != PreviewMode.None);
+            EditorGUI.BeginDisabledGroup(_previewMode != PreviewMode.None);
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(40));
             float newValue = EditorHelper.PreviewProgress(progressRect, _tween.progress, _thumbStyle);
             if (!Mathf.Approximately(newValue, _tween.progress))
@@ -169,7 +171,7 @@
         {
             if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", _leftStyle))
             {
-                if (_mode == PreviewMode.RecordStart)
+                if (_previewMode == PreviewMode.RecordStart)
                 {
                     _tween.progress = 0f;
                     _tween.Apply();
@@ -187,7 +189,7 @@
         {
             if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", _rightStyle))
             {
-                if (_mode == PreviewMode.RecordEnd)
+                if (_previewMode == PreviewMode.RecordEnd)
                 {
                     _tween.progress = 1f;
                     _tween.Apply();
@@ -213,7 +215,7 @@
 
         private void DrawRewindButton()
         {
-            bool shouldBeActive = _tween.progress > 0 && _mode == PreviewMode.None;
+            bool shouldBeActive = _tween.progress > 0 && _previewMode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
             if (GUILayout.Button("Re", _middleStyle))
@@ -228,11 +230,11 @@
 
         private void DrawPlayButton()
         {
-            bool before = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
+            bool before = _previewMode == PreviewMode.Playing || _previewMode == PreviewMode.Paused;
             bool after = GUILayout.Toggle(before, before ? _playOn : _playNormal, _middleStyle);
             if (before != after)
             {
-                _mode = after ? PreviewMode.Playing : PreviewMode.None;
+                _previewMode = after ? PreviewMode.Playing : PreviewMode.None;
 
                 // reset our progress only if we are at the end in a wrap once tween
                 if (_tween.wrapMode == WrapMode.Once && _tween.progress >= 1f)
@@ -259,14 +261,14 @@
 
         private void DrawPauseButton()
         {
-            bool shouldBeActive = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
+            bool shouldBeActive = _previewMode == PreviewMode.Playing || _previewMode == PreviewMode.Paused;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            bool before = _mode == PreviewMode.Paused;
+            bool before = _previewMode == PreviewMode.Paused;
             bool after = GUILayout.Toggle(before, before ? _pauseOn : _pauseNormal, _middleStyle);
             if (before != after)
             {
-                _mode = after ? PreviewMode.Paused : PreviewMode.Playing;
+                _previewMode = after ? PreviewMode.Paused : PreviewMode.Playing;
             }
             EditorGUI.EndDisabledGroup();
         }
@@ -274,7 +276,7 @@
         private void UpdatePreview()
         {
             // if we are paused we dont want to do anything
-            if (_mode != PreviewMode.Playing)
+            if (_previewMode != PreviewMode.Playing)
             {
                 return;
             }
@@ -285,21 +287,21 @@
 
             if (_tween.progress >= 1f && _tween.wrapMode == WrapMode.Once)
             {
-                _mode = PreviewMode.None;
+                _previewMode = PreviewMode.None;
                 EditorApplication.update -= UpdatePreview;
             }
         }
 
         private bool DrawRecordModeToggle(PreviewMode mode, PreviewMode otherRecord, string text, GUIStyle leftStyle, params GUILayoutOption[] options)
         {
-            bool shouldBeActive = _mode == PreviewMode.None || _mode == mode || _mode == otherRecord;
+            bool shouldBeActive = _previewMode == PreviewMode.None || _previewMode == mode || _previewMode == otherRecord;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            bool before = _mode == mode;
+            bool before = _previewMode == mode;
             bool after = GUILayout.Toggle(before, text, leftStyle, options);
             if (before != after)
             {
-                _mode = after ? mode : PreviewMode.None;
+                _previewMode = after ? mode : PreviewMode.None;
             }
             EditorGUI.EndDisabledGroup();
             return before != after;
@@ -324,12 +326,33 @@
 
             EditorGUILayout.PropertyField(_playModeProperty);
             EditorGUILayout.PropertyField(_wrapModeProperty);
-            EditorGUILayout.PropertyField(_easingModeProperty);
 
-            EasingMode easingMode = (EasingMode) _easingModeProperty.enumValueIndex;
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(_easingModeProperty);
+            EasingMode easingMode = (EasingMode)_easingModeProperty.enumValueIndex;
+
+            if (EditorGUI.EndChangeCheck() || _easingIcon == null && easingMode != EasingMode.CustomCurve)
+            {
+                if (easingMode != EasingMode.CustomCurve)
+                {
+                    string enumString = ((EasingMode)_easingModeProperty.enumValueIndex).ToString();
+                    string easingIconPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Easings/") + enumString + ".png";
+                    _easingIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(easingIconPath);
+                }
+                else
+                {
+                    _easingIcon = null;
+                }
+            }
+
             if (easingMode == EasingMode.CustomCurve)
             {
                 EditorGUILayout.PropertyField(_customCurveProperty);
+            }
+            else
+            {
+                Rect easingIconRect = GUILayoutUtility.GetRect(_easingIcon.width, _easingIcon.height, GUIStyle.none);
+                GUI.DrawTexture(easingIconRect, _easingIcon, ScaleMode.ScaleToFit);
             }
 
             EditorGUI.indentLevel--;
