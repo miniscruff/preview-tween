@@ -1,15 +1,12 @@
 ﻿namespace PreviewTween
 {
     using System.Collections.Generic;
-    using System.IO;
     using UnityEditor;
     using UnityEngine;
 
     public enum PreviewMode
     {
         None,
-        RecordStart,
-        RecordEnd,
         Playing,
         Paused
     }
@@ -38,14 +35,11 @@
         private GUIStyle _rightStyle;
         private GUIStyle _thumbStyle;
 
-        //private GUIContent _recordStartNormal;
-        //private GUIContent _recordStartOn;
-        private GUIContent _playNormal;
-        private GUIContent _playOn;
-        private GUIContent _pauseNormal;
-        private GUIContent _pauseOn;
-        //private GUIContent _recordStartNormal;
-        //private GUIContent _recordStartOn;
+        private GUIContent _recordStartContent;
+        private GUIContent _rewindContent;
+        private GUIContent _playContent;
+        private GUIContent _pauseContent;
+        private GUIContent _recordEndContent;
 
         private void OnEnable()
         {
@@ -119,17 +113,18 @@
 
         private void LoadTextures()
         {
-            if (_playNormal != null)
+            if (_playContent != null)
             {
                 return;
             }
 
             string iconFolderPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Icons/");
 
-            _playNormal = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PlayNormal.png"));
-            _playOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PlayOn.png"));
-            _pauseNormal = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PauseNormal.png"));
-            _pauseOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PauseOn.png"));
+            _recordStartContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordStart.png"));
+            _rewindContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Rewind.png"));
+            _playContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Play.png"));
+            _pauseContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Pause.png"));
+            _recordEndContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordEnd.png"));
         }
 
         private void DrawCustom()
@@ -169,48 +164,20 @@
 
         private void DrawRecordStartButton()
         {
-            if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", _leftStyle))
+            if (DrawRecordModeToggle(0f, _recordStartContent, _leftStyle))
             {
-                if (_previewMode == PreviewMode.RecordStart)
-                {
-                    _tween.progress = 0f;
-                    _tween.Apply();
-                    EditorApplication.update += UpdateRecordStart;
-                    EditorApplication.update -= UpdateRecordEnd;
-                }
-                else
-                {
-                    EditorApplication.update -= UpdateRecordStart;
-                }
+                Undo.RecordObject(target, "Recording Start Value");
+                _tween.RecordStart();
             }
         }
 
         private void DrawRecordEndButton()
         {
-            if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", _rightStyle))
+            if (DrawRecordModeToggle(1f, _recordEndContent, _rightStyle))
             {
-                if (_previewMode == PreviewMode.RecordEnd)
-                {
-                    _tween.progress = 1f;
-                    _tween.Apply();
-                    EditorApplication.update += UpdateRecordEnd;
-                    EditorApplication.update -= UpdateRecordStart;
-                }
-                else
-                {
-                    EditorApplication.update -= UpdateRecordEnd;
-                }
+                Undo.RecordObject(target, "Recording End Value");
+                _tween.RecordEnd();
             }
-        }
-
-        private void UpdateRecordStart()
-        {
-            _tween.RecordStart();
-        }
-
-        private void UpdateRecordEnd()
-        {
-            _tween.RecordEnd();
         }
 
         private void DrawRewindButton()
@@ -218,7 +185,7 @@
             bool shouldBeActive = _tween.progress > 0 && _previewMode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            if (GUILayout.Button("Re", _middleStyle))
+            if (GUILayout.Button(_rewindContent, _middleStyle))
             {
                 _tween.progress = 0f;
                 _tween.direction = 1;
@@ -231,7 +198,7 @@
         private void DrawPlayButton()
         {
             bool before = _previewMode == PreviewMode.Playing || _previewMode == PreviewMode.Paused;
-            bool after = GUILayout.Toggle(before, before ? _playOn : _playNormal, _middleStyle);
+            bool after = GUILayout.Toggle(before, _playContent, _middleStyle);
             if (before != after)
             {
                 _previewMode = after ? PreviewMode.Playing : PreviewMode.None;
@@ -244,9 +211,6 @@
 
                 _tween.direction = 1;
                 _tween.Apply();
-
-                EditorApplication.update -= UpdateRecordStart;
-                EditorApplication.update -= UpdateRecordEnd;
 
                 if (after)
                 {
@@ -265,7 +229,7 @@
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
             bool before = _previewMode == PreviewMode.Paused;
-            bool after = GUILayout.Toggle(before, before ? _pauseOn : _pauseNormal, _middleStyle);
+            bool after = GUILayout.Toggle(before, _pauseContent, _middleStyle);
             if (before != after)
             {
                 _previewMode = after ? PreviewMode.Paused : PreviewMode.Playing;
@@ -292,19 +256,14 @@
             }
         }
 
-        private bool DrawRecordModeToggle(PreviewMode mode, PreviewMode otherRecord, string text, GUIStyle leftStyle, params GUILayoutOption[] options)
+        private bool DrawRecordModeToggle(float currentProgress, GUIContent content, GUIStyle leftStyle, params GUILayoutOption[] options)
         {
-            bool shouldBeActive = _previewMode == PreviewMode.None || _previewMode == mode || _previewMode == otherRecord;
+            bool shouldBeActive = Mathf.Approximately(_tween.progress, currentProgress) && _previewMode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            bool before = _previewMode == mode;
-            bool after = GUILayout.Toggle(before, text, leftStyle, options);
-            if (before != after)
-            {
-                _previewMode = after ? mode : PreviewMode.None;
-            }
+            bool result = GUILayout.Button(content, leftStyle, options);
             EditorGUI.EndDisabledGroup();
-            return before != after;
+            return result;
         }
 
         private void DrawSettings()
