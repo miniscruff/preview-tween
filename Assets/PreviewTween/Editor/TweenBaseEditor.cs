@@ -1,6 +1,7 @@
 ﻿namespace PreviewTween
 {
     using System.Collections.Generic;
+    using System.IO;
     using UnityEditor;
     using UnityEngine;
 
@@ -29,17 +30,20 @@
         private TweenBase _tween;
         private PreviewMode _mode;
 
+        private bool _cachedIsProSkin;
         private GUIStyle _leftStyle;
         private GUIStyle _middleStyle;
         private GUIStyle _rightStyle;
         private GUIStyle _thumbStyle;
 
-        private GUIContent _recordStartNormal;
-        private GUIContent _recordStartOn;
-
-        // Icons are still a work in progress
-        //private GUIContent _playNormal;
-        //private GUIContent _playOn;
+        //private GUIContent _recordStartNormal;
+        //private GUIContent _recordStartOn;
+        private GUIContent _playNormal;
+        private GUIContent _playOn;
+        private GUIContent _pauseNormal;
+        private GUIContent _pauseOn;
+        //private GUIContent _recordStartNormal;
+        //private GUIContent _recordStartOn;
 
         private void OnEnable()
         {
@@ -98,12 +102,13 @@
 
         private void LoadStyles()
         {
-            // if any are not null, we are fine
-            if (_leftStyle != null)
+            // we will need to reload our styles if we change from pro to personal skins
+            if (_leftStyle != null && EditorGUIUtility.isProSkin == _cachedIsProSkin)
             {
                 return;
             }
 
+            _cachedIsProSkin = EditorGUIUtility.isProSkin;
             _leftStyle = GUI.skin.FindStyle("LargeButtonLeft");
             _middleStyle = GUI.skin.FindStyle("LargeButtonMid");
             _rightStyle = GUI.skin.FindStyle("LargeButtonRight");
@@ -112,14 +117,17 @@
 
         private void LoadTextures()
         {
-            // tried using build in icons, doesnt seem to want to work
-            //if (_playNormal != null)
-            //{
-            //    return;
-            //}
+            if (_playNormal != null)
+            {
+                return;
+            }
 
-            //_playNormal = new GUIContent(EditorGUIUtility.Load("PlayButton") as Texture);
-            //_playOn = new GUIContent(EditorGUIUtility.Load("PlayButton On") as Texture);
+            string iconFolderPath = GetProjectDirectory("/Editor/Icons/");
+
+            _playNormal = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PlayNormal.png"));
+            _playOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PlayOn.png"));
+            _pauseNormal = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PauseNormal.png"));
+            _pauseOn = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "PauseOn.png"));
         }
 
         private void DrawCustom()
@@ -159,7 +167,7 @@
 
         private void DrawRecordStartButton()
         {
-            if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", _leftStyle, GUILayout.Width(60)))
+            if (DrawRecordModeToggle(PreviewMode.RecordStart, PreviewMode.RecordEnd, "Rec S", _leftStyle))
             {
                 if (_mode == PreviewMode.RecordStart)
                 {
@@ -177,7 +185,7 @@
 
         private void DrawRecordEndButton()
         {
-            if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", _rightStyle, GUILayout.Width(60)))
+            if (DrawRecordModeToggle(PreviewMode.RecordEnd, PreviewMode.RecordStart, "Rec E", _rightStyle))
             {
                 if (_mode == PreviewMode.RecordEnd)
                 {
@@ -208,7 +216,7 @@
             bool shouldBeActive = _tween.progress > 0 && _mode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            if (GUILayout.Button("Re", _middleStyle, GUILayout.Width(60)))
+            if (GUILayout.Button("Re", _middleStyle))
             {
                 _tween.progress = 0f;
                 _tween.direction = 1;
@@ -221,7 +229,7 @@
         private void DrawPlayButton()
         {
             bool before = _mode == PreviewMode.Playing || _mode == PreviewMode.Paused;
-            bool after = GUILayout.Toggle(before, "Pl", _middleStyle, GUILayout.Width(50));
+            bool after = GUILayout.Toggle(before, before ? _playOn : _playNormal, _middleStyle);
             if (before != after)
             {
                 _mode = after ? PreviewMode.Playing : PreviewMode.None;
@@ -255,7 +263,7 @@
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
             bool before = _mode == PreviewMode.Paused;
-            bool after = GUILayout.Toggle(before, "Pa", _middleStyle, GUILayout.Width(60));
+            bool after = GUILayout.Toggle(before, before ? _pauseOn : _pauseNormal, _middleStyle);
             if (before != after)
             {
                 _mode = after ? PreviewMode.Paused : PreviewMode.Playing;
@@ -406,6 +414,22 @@
             EditorGUILayout.Separator();
 
             EditorGUILayout.PropertyField(_onCompleteProperty);
+        }
+
+        private static string GetProjectDirectory(string childPath)
+        {
+            string iconFolderPath = null;
+            string[] allDirectories = Directory.GetDirectories("Assets", "PreviewTween", SearchOption.AllDirectories);
+            foreach (string dir in allDirectories)
+            {
+                iconFolderPath = dir + childPath;
+                if (Directory.Exists(iconFolderPath))
+                {
+                    break;
+                }
+            }
+
+            return iconFolderPath;
         }
     }
 }
