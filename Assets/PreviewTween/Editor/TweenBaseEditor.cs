@@ -14,7 +14,7 @@
     [CustomEditor(typeof(TweenBase), true)]
     public sealed class TweenBaseEditor : Editor
     {
-        private readonly List<SerializedProperty> _customProperties = new List<SerializedProperty>();
+        private readonly List<SerializedProperty> _additionalProperties = new List<SerializedProperty>();
 
         private SerializedProperty _delayProperty;
         private SerializedProperty _durationProperty;
@@ -39,6 +39,7 @@
         private GUIContent _rewindContent;
         private GUIContent _playContent;
         private GUIContent _pauseContent;
+        private GUIContent _forwardContent;
         private GUIContent _recordEndContent;
 
         private void OnEnable()
@@ -71,7 +72,7 @@
                         break;
                     // all the values that our custom tween provides will go in here and be visible at the top of our editor
                     default:
-                        _customProperties.Add(serializedObject.FindProperty(iterator.name));
+                        _additionalProperties.Add(serializedObject.FindProperty(iterator.name));
                         break;
                 }
             }
@@ -89,7 +90,7 @@
 
             serializedObject.Update();
 
-            DrawCustom();
+            DrawAdditionalProperties();
             DrawPreview();
             DrawSettings();
 
@@ -105,9 +106,9 @@
             }
 
             _cachedIsProSkin = EditorGUIUtility.isProSkin;
-            _leftStyle = GUI.skin.FindStyle("LargeButtonLeft");
-            _middleStyle = GUI.skin.FindStyle("LargeButtonMid");
-            _rightStyle = GUI.skin.FindStyle("LargeButtonRight");
+            _leftStyle = GUI.skin.FindStyle("ButtonLeft");
+            _middleStyle = GUI.skin.FindStyle("ButtonMid");
+            _rightStyle = GUI.skin.FindStyle("ButtonRight");
             _thumbStyle = GUI.skin.FindStyle("MeTransPlayhead");
         }
 
@@ -124,12 +125,13 @@
             _rewindContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Rewind.png"));
             _playContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Play.png"));
             _pauseContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Pause.png"));
+            _forwardContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Forward.png"));
             _recordEndContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordEnd.png"));
         }
 
-        private void DrawCustom()
+        private void DrawAdditionalProperties()
         {
-            foreach (SerializedProperty custom in _customProperties)
+            foreach (SerializedProperty custom in _additionalProperties)
             {
                 EditorGUILayout.PropertyField(custom);
             }
@@ -156,6 +158,7 @@
             DrawRewindButton();
             DrawPlayButton();
             DrawPauseButton();
+            DrawForwardButton();
             DrawRecordEndButton();
 
             GUILayout.FlexibleSpace();
@@ -189,6 +192,21 @@
             {
                 _tween.progress = 0f;
                 _tween.direction = 1;
+                _tween.Apply();
+            }
+
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void DrawForwardButton()
+        {
+            bool shouldBeActive = _tween.progress < 1 && _previewMode == PreviewMode.None;
+            EditorGUI.BeginDisabledGroup(!shouldBeActive);
+
+            if (GUILayout.Button(_forwardContent, _middleStyle))
+            {
+                _tween.progress = 1f;
+                _tween.direction = -1;
                 _tween.Apply();
             }
 
@@ -256,12 +274,12 @@
             }
         }
 
-        private bool DrawRecordModeToggle(float currentProgress, GUIContent content, GUIStyle leftStyle, params GUILayoutOption[] options)
+        private bool DrawRecordModeToggle(float currentProgress, GUIContent content, GUIStyle buttonStyle)
         {
             bool shouldBeActive = Mathf.Approximately(_tween.progress, currentProgress) && _previewMode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            bool result = GUILayout.Button(content, leftStyle, options);
+            bool result = GUILayout.Button(content, buttonStyle);
             EditorGUI.EndDisabledGroup();
             return result;
         }
