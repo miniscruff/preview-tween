@@ -118,6 +118,25 @@
         }
 
         [UnityTest]
+        public IEnumerator Play_NegativeDirection_GoesToStart()
+        {
+            _tween.start = 10f;
+            _tween.end = 20f;
+
+            _tween.progress = 0.25f;
+            _tween.direction = -1;
+
+            _tween.Play();
+            Assert.IsTrue(_tween.isPlaying);
+            yield return new WaitForSeconds(0.25f);
+
+            Assert.IsFalse(_tween.isPlaying);
+
+            Assert.AreEqual(10f, _tween.value);
+            Assert.AreEqual(0f, _tween.progress);
+        }
+
+        [UnityTest]
         public IEnumerator Play_CallingMoreThanOnce_DoesntEndFaster()
         {
             _tween.start = 10f;
