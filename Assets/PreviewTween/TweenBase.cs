@@ -30,6 +30,8 @@
 
     public abstract class TweenBase : MonoBehaviour
     {
+        public const float minimum_duration = 0.1f;
+
         // tween values
         private float _progress;
         private bool _isPlaying;
@@ -58,19 +60,40 @@
         public int direction
         {
             get { return _direction; }
-            set { _direction = value; }
+            set
+            {
+                if (value != 1 && value != -1)
+                {
+                    throw new ArgumentOutOfRangeException("value", "Cant set direction to a value other than 1 and -1");
+                }
+                _direction = value;
+            }
         }
 
         public float delay
         {
             get { return _delay; }
-            set { _delay = value; }
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException("value", "Cant set delay to a value < 0");
+                }
+                _delay = value;
+            }
         }
 
         public float duration
         {
             get { return _duration; }
-            set { _duration = value; }
+            set
+            {
+                if (value < minimum_duration)
+                {
+                    throw new ArgumentOutOfRangeException("value", "Cant set duration to a value < " + minimum_duration);
+                }
+                _duration = value;
+            }
         }
 
         public PlayMode playMode
@@ -204,6 +227,11 @@
 
         public void Tick(float deltaTime)
         {
+            if (deltaTime <= 0f)
+            {
+                throw new ArgumentOutOfRangeException("deltaTime", "Cant tick the tween by a value <= 0");
+            }
+
             _progress += deltaTime / _duration * _direction;
             if (_progress <= 0f || _progress >= 1f)
             {

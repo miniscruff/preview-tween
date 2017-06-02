@@ -1,9 +1,11 @@
 ﻿namespace PreviewTween
 {
+    using System;
     using System.Collections;
     using NUnit.Framework;
     using UnityEngine;
     using UnityEngine.TestTools;
+    using Object = UnityEngine.Object;
 
     public sealed class TestTween : TweenBase
     {
@@ -597,6 +599,39 @@
             _tween.easingMode = EasingMode.QuadraticInOut;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.QuadraticInOut(progress), _tween.value));
+        }
+
+        [Test]
+        public void Delay_LessThanZero_ThrowsError()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _tween.delay = -2f);
+            Assert.AreEqual(0f, _tween.delay);
+        }
+
+        [Test]
+        public void Duration_LessThanMinimum_ThrowsError()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _tween.duration = TweenBase.minimum_duration - 1f);
+            Assert.AreEqual(1f, _tween.duration);
+        }
+
+        [Test]
+        public void Direction_NotOneOrNegativeOne_ThrowsError()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _tween.direction = 4);
+            Assert.AreEqual(1, _tween.direction);
+        }
+
+        [Test]
+        public void Tick_WithZeroDeltaTime_ThrowsError()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _tween.Tick(0f));
+        }
+
+        [Test]
+        public void Tick_WithNegativeDeltaTime_ThrowsError()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _tween.Tick(-6f));
         }
     }
 }

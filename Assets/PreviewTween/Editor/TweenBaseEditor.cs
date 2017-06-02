@@ -278,9 +278,9 @@
             }
 
             EditorGUILayout.PropertyField(_durationProperty);
-            if (_durationProperty.floatValue < 0.1f)
+            if (_durationProperty.floatValue < TweenBase.minimum_duration)
             {
-                _durationProperty.floatValue = 0.1f;
+                _durationProperty.floatValue = TweenBase.minimum_duration;
             }
 
             EditorGUILayout.PropertyField(_playModeProperty);
