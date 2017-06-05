@@ -56,9 +56,30 @@
             }
         }
 
-        // QuarticIn
-        // QuarticOut
-        // QuarticInOut
+        public static class Quartic
+        {
+            public static float In(float time)
+            {
+                return time * time * time * time;
+            }
+
+            public static float Out(float time)
+            {
+                time -= 1f;
+                return -(time * time * time * time - 1f);
+            }
+
+            public static float InOut(float time)
+            {
+                time *= 2f;
+                if (time < 1f)
+                {
+                    return 0.5f * time * time * time * time;
+                }
+                time -= 2f;
+                return -0.5f * (time * time * time * time - 2f);
+            }
+        }
 
         // QuinticIn
         // QuinticOut

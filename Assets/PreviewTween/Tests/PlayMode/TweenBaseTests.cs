@@ -588,6 +588,7 @@
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Linear(progress), _tween.value));
 
+            // Quadratic
             _tween.easingMode = EasingMode.QuadraticIn;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Quadratic.In(progress), _tween.value));
@@ -600,6 +601,7 @@
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Quadratic.InOut(progress), _tween.value));
 
+            // Cubic
             _tween.easingMode = EasingMode.CubicIn;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Cubic.In(progress), _tween.value));
@@ -611,6 +613,19 @@
             _tween.easingMode = EasingMode.CubicInOut;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Cubic.InOut(progress), _tween.value));
+
+            // Quartic
+            _tween.easingMode = EasingMode.QuarticIn;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Quartic.In(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuarticOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Quartic.Out(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuarticInOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Quartic.InOut(progress), _tween.value));
         }
 
         [Test]

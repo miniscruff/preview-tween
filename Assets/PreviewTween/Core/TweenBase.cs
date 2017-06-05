@@ -28,6 +28,9 @@
         CubicIn,
         CubicOut,
         CubicInOut,
+        QuarticIn,
+        QuarticOut,
+        QuarticInOut,
         CustomCurve
     }
 
@@ -289,18 +292,28 @@
             {
                 case EasingMode.Linear:
                     return Easings.Linear(_progress);
+                // Quadratic
                 case EasingMode.QuadraticIn:
                     return Easings.Quadratic.In(_progress);
                 case EasingMode.QuadraticOut:
                     return Easings.Quadratic.Out(_progress);
                 case EasingMode.QuadraticInOut:
                     return Easings.Quadratic.InOut(_progress);
+                // Cubic
                 case EasingMode.CubicIn:
                     return Easings.Cubic.In(_progress);
                 case EasingMode.CubicOut:
                     return Easings.Cubic.Out(_progress);
                 case EasingMode.CubicInOut:
                     return Easings.Cubic.InOut(_progress);
+                // Quartic
+                case EasingMode.QuarticIn:
+                    return Easings.Quartic.In(_progress);
+                case EasingMode.QuarticOut:
+                    return Easings.Quartic.Out(_progress);
+                case EasingMode.QuarticInOut:
+                    return Easings.Quartic.InOut(_progress);
+                // Custom
                 case EasingMode.CustomCurve:
                     return _customCurve.Evaluate(_progress);
             }

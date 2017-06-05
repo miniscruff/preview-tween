@@ -138,5 +138,23 @@
         {
             CompareEasingToCache(Easings.Cubic.InOut, "CubicInOut");
         }
+
+        [Test]
+        public void Quartic_In()
+        {
+            CompareEasingToCache(Easings.Quartic.In, "QuarticIn");
+        }
+
+        [Test]
+        public void Quartic_Out()
+        {
+            CompareEasingToCache(Easings.Quartic.Out, "QuarticOut");
+        }
+
+        [Test]
+        public void Quartic_InOut()
+        {
+            CompareEasingToCache(Easings.Quartic.InOut, "QuarticInOut");
+        }
     }
 }
