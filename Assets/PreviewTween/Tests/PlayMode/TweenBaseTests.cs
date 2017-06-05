@@ -576,7 +576,7 @@
             Assert.AreEqual(curve.Evaluate(0.6f), _tween.value);
         }
 
-        [Test]
+        [Test] // TODO: Simplify and split this into at least some categories
         public void CheckAllEasings()
         {
             const float progress = 0.25f;
@@ -626,6 +626,19 @@
             _tween.easingMode = EasingMode.QuarticInOut;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Quartic.InOut(progress), _tween.value));
+
+            // Quintic
+            _tween.easingMode = EasingMode.QuinticIn;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Quintic.In(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuinticOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Quintic.Out(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.QuinticInOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Quintic.InOut(progress), _tween.value));
         }
 
         [Test]

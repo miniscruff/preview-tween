@@ -51,10 +51,12 @@
             }
 
             byte[] pngBytes = texture.EncodeToPNG();
-            Texture2D existingTexture = Resources.Load<Texture2D>("Easings/" + filePath);
-            if (existingTexture != null)
+
+            string easingsPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Easings/");
+            string fullPath = easingsPath + filePath + ".png";
+            if (File.Exists(fullPath))
             {
-                byte[] existingTextureBytes = existingTexture.EncodeToPNG();
+                byte[] existingTextureBytes = File.ReadAllBytes(fullPath);
                 CollectionAssert.AreEqual(existingTextureBytes, pngBytes);
             }
             else
@@ -62,13 +64,10 @@
                 // if we dont have the image already, this will create it
                 // it is up to the creator to verify the image is accurate after making it
                 // if its not accurate, edit the algorithm and delete the image to remake the comparison image
-
-                string easingsPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Easings/");
-                string fullPath = easingsPath + filePath + ".png";
                 File.WriteAllBytes(fullPath, pngBytes);
                 AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-                // we have to setup our import settings so we can use it for our easings dialog and to read it in future tests
+                // we have to setup our import settings so we can use it for our easings display and in future tests
                 TextureImporter textureImporter = AssetImporter.GetAtPath(fullPath) as TextureImporter;
                 textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
                 textureImporter.isReadable = true;
@@ -155,6 +154,24 @@
         public void Quartic_InOut()
         {
             CompareEasingToCache(Easings.Quartic.InOut, "QuarticInOut");
+        }
+
+        [Test]
+        public void Quintic_In()
+        {
+            CompareEasingToCache(Easings.Quintic.In, "QuinticIn");
+        }
+
+        [Test]
+        public void Quintic_Out()
+        {
+            CompareEasingToCache(Easings.Quintic.Out, "QuinticOut");
+        }
+
+        [Test]
+        public void Quintic_InOut()
+        {
+            CompareEasingToCache(Easings.Quintic.InOut, "QuinticInOut");
         }
     }
 }

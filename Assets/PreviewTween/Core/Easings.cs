@@ -81,16 +81,37 @@
             }
         }
 
-        // QuinticIn
-        // QuinticOut
-        // QuinticInOut
+        public static class Quintic
+        {
+            public static float In(float time)
+            {
+                return time * time * time * time * time;
+            }
 
-        // ExponentialIn
-        // ExponentialOut
-        // ExponentialInOut
+            public static float Out(float time)
+            {
+                time -= 1f;
+                return time * time * time * time * time + 1f;
+            }
+
+            public static float InOut(float time)
+            {
+                time *= 2f;
+                if (time < 1f)
+                {
+                    return 0.5f * time * time * time * time * time;
+                }
+                time -= 2f;
+                return 0.5f * (time * time * time * time * time + 2f);
+            }
+        }
 
         // BounceIn
         // BounceOut
         // BounceInOut
+
+        // BackIn
+        // BackOut
+        // BackInOut
     }
 }

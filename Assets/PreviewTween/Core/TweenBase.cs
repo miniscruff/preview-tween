@@ -31,6 +31,9 @@
         QuarticIn,
         QuarticOut,
         QuarticInOut,
+        QuinticIn,
+        QuinticOut,
+        QuinticInOut,
         CustomCurve
     }
 
@@ -313,6 +316,13 @@
                     return Easings.Quartic.Out(_progress);
                 case EasingMode.QuarticInOut:
                     return Easings.Quartic.InOut(_progress);
+                // Quintic
+                case EasingMode.QuinticIn:
+                    return Easings.Quintic.In(_progress);
+                case EasingMode.QuinticOut:
+                    return Easings.Quintic.Out(_progress);
+                case EasingMode.QuinticInOut:
+                    return Easings.Quintic.InOut(_progress);
                 // Custom
                 case EasingMode.CustomCurve:
                     return _customCurve.Evaluate(_progress);
