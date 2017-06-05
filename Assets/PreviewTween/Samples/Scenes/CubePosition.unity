@@ -207,7 +207,7 @@ MonoBehaviour:
   _duration: 1
   _playMode: 1
   _wrapMode: 2
-  _easingMode: 10
+  _easingMode: 15
   _customCurve:
     serializedVersion: 2
     m_Curve:
@@ -231,8 +231,10 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  _target: {fileID: 1705265696}
   _start: {x: -5, y: 0, z: 0}
   _end: {x: 5, y: 0, z: 1}
+  _worldSpace: 1
 --- !u!23 &1705265693
 MeshRenderer:
   m_ObjectHideFlags: 0

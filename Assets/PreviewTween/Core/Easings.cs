@@ -1,4 +1,5 @@
-﻿namespace PreviewTween
+﻿// Easing algorithms were derived from Robert Penners algorithms here: http://robertpenner.com/easing/
+namespace PreviewTween
 {
     public static class Easings
     {
