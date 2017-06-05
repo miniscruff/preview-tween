@@ -104,21 +104,39 @@
         }
 
         [Test]
-        public void QuadraticIn()
+        public void Quadratic_In()
         {
-            CompareEasingToCache(Easings.QuadraticIn, "QuadraticIn");
+            CompareEasingToCache(Easings.Quadratic.In, "QuadraticIn");
         }
 
         [Test]
-        public void QuadraticOut()
+        public void Quadratic_Out()
         {
-            CompareEasingToCache(Easings.QuadraticOut, "QuadraticOut");
+            CompareEasingToCache(Easings.Quadratic.Out, "QuadraticOut");
         }
 
         [Test]
-        public void QuadraticInOut()
+        public void Quadratic_InOut()
         {
-            CompareEasingToCache(Easings.QuadraticInOut, "QuadraticInOut");
+            CompareEasingToCache(Easings.Quadratic.InOut, "QuadraticInOut");
+        }
+
+        [Test]
+        public void Cubic_In()
+        {
+            CompareEasingToCache(Easings.Cubic.In, "CubicIn");
+        }
+
+        [Test]
+        public void Cubic_Out()
+        {
+            CompareEasingToCache(Easings.Cubic.Out, "CubicOut");
+        }
+
+        [Test]
+        public void Cubic_InOut()
+        {
+            CompareEasingToCache(Easings.Cubic.InOut, "CubicInOut");
         }
     }
 }

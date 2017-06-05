@@ -189,7 +189,7 @@
         {
             _tween.start = 10f;
             _tween.end = 20f;
-            _tween.delay = 1f;
+            _tween.delay = 0.5f;
 
             _tween.Play();
             Assert.IsTrue(_tween.isPlaying);
@@ -198,7 +198,7 @@
             Assert.IsTrue(_tween.isPlaying);
             Assert.AreEqual(0f, _tween.progress);
 
-            yield return new WaitForSeconds(0.75f);
+            yield return new WaitForSeconds(0.3f);
             Assert.AreNotEqual(0f, _tween.progress);
 
             yield return new WaitForSeconds(1f);
@@ -590,15 +590,27 @@
 
             _tween.easingMode = EasingMode.QuadraticIn;
             _tween.Apply();
-            Assert.IsTrue(Mathf.Approximately(Easings.QuadraticIn(progress), _tween.value));
+            Assert.IsTrue(Mathf.Approximately(Easings.Quadratic.In(progress), _tween.value));
 
             _tween.easingMode = EasingMode.QuadraticOut;
             _tween.Apply();
-            Assert.IsTrue(Mathf.Approximately(Easings.QuadraticOut(progress), _tween.value));
+            Assert.IsTrue(Mathf.Approximately(Easings.Quadratic.Out(progress), _tween.value));
 
             _tween.easingMode = EasingMode.QuadraticInOut;
             _tween.Apply();
-            Assert.IsTrue(Mathf.Approximately(Easings.QuadraticInOut(progress), _tween.value));
+            Assert.IsTrue(Mathf.Approximately(Easings.Quadratic.InOut(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.CubicIn;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Cubic.In(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.CubicOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Cubic.Out(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.CubicInOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Cubic.InOut(progress), _tween.value));
         }
 
         [Test]
