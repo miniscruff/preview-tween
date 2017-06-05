@@ -652,6 +652,19 @@
             _tween.easingMode = EasingMode.BounceInOut;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Bounce.InOut(progress), _tween.value));
+
+            // Back
+            _tween.easingMode = EasingMode.BackIn;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Back.In(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.BackOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Back.Out(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.BackInOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Back.InOut(progress), _tween.value));
         }
 
         [Test]

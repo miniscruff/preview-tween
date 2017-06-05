@@ -37,6 +37,9 @@
         BounceIn,
         BounceOut,
         BounceInOut,
+        BackIn,
+        BackOut,
+        BackInOut,
         CustomCurve
     }
 
@@ -333,6 +336,13 @@
                     return Easings.Bounce.Out(_progress);
                 case EasingMode.BounceInOut:
                     return Easings.Bounce.InOut(_progress);
+                // Back
+                case EasingMode.BackIn:
+                    return Easings.Back.In(_progress);
+                case EasingMode.BackOut:
+                    return Easings.Back.Out(_progress);
+                case EasingMode.BackInOut:
+                    return Easings.Back.InOut(_progress);
                 // Custom
                 case EasingMode.CustomCurve:
                     return _customCurve.Evaluate(_progress);

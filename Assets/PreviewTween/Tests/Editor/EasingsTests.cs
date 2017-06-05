@@ -13,32 +13,26 @@
             CompareEasingToCache(easingFunc, filePath, 100, 0);
         }
 
-        private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath, int height, int startingHeight)
+        private static void CompareEasingToCache(Func<float, float> easingFunc, string filePath, int imageheight, int startingHeight)
         {
+            const int lerp_height = 99;
             const int width = 100;
             const int width_buffer = 5;
 
-            // we need to subtract 1 so that a value of 1 on our easing is height - 1 on our texture
-            float lerpHeight = height - startingHeight - 1f;
-
             // add a few pixels of width so we can use a value of 1 and not go out of range
-            Texture2D texture = new Texture2D(width + width_buffer * 2, height, TextureFormat.RGBA32, false)
+            Texture2D texture = new Texture2D(width + width_buffer * 2, imageheight, TextureFormat.RGBA32, false)
             {
                 filterMode = FilterMode.Point
             };
-            GenerateBaesTexture(texture, width, height, width_buffer, startingHeight);
+            GenerateBaseTexture(texture, width, imageheight, width_buffer, startingHeight);
 
             for (float x = 0; x <= width; x += 0.25f)
             {
                 float progress = x / width;
                 float factor = easingFunc(progress);
 
-                // our easing function should always be between 0 and 1
-                Assert.IsTrue(factor >= 0f);
-                Assert.IsTrue(factor <= 1f);
-
-                int y = Mathf.RoundToInt(Mathf.Lerp(0f, lerpHeight, factor) + startingHeight);
-                Assert.IsTrue(y < height);
+                int y = Mathf.RoundToInt(factor * lerp_height + startingHeight);
+                Assert.IsTrue(y < imageheight);
 
                 // set the value to black on our texture
                 texture.SetPixel((int)x + width_buffer, y, Color.green);
@@ -78,13 +72,13 @@
             }
         }
 
-        private static void GenerateBaesTexture(Texture2D texture, int width, int height, int widthBuffer, int startingHeight)
+        private static void GenerateBaseTexture(Texture2D texture, int width, int height, int widthBuffer, int startingHeight)
         {
             for (int x = 0; x < width + widthBuffer * 2; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (y == startingHeight || y == height - startingHeight - 1 || x == widthBuffer || x == width + widthBuffer)
+                    if (y == startingHeight || y == 100 + startingHeight - 1 || x == widthBuffer || x == width + widthBuffer)
                     {
                         texture.SetPixel(x, y, Color.black);
                     }
@@ -190,6 +184,24 @@
         public void Bounce_InOut()
         {
             CompareEasingToCache(Easings.Bounce.InOut, "BounceInOut");
+        }
+
+        [Test]
+        public void Back_In()
+        {
+            CompareEasingToCache(Easings.Back.In, "BackIn", 120, 20);
+        }
+
+        [Test]
+        public void Back_Out()
+        {
+            CompareEasingToCache(Easings.Back.Out, "BackOut", 120, 0);
+        }
+
+        [Test]
+        public void Back_InOut()
+        {
+            CompareEasingToCache(Easings.Back.InOut, "BackInOut", 140, 20);
         }
     }
 }

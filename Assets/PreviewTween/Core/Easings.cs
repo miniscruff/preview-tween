@@ -143,12 +143,34 @@
             }
         }
 
-        // BounceIn
-        // BounceOut
-        // BounceInOut
+        public static class Back
+        {
+            private const float overshoot = 1.70158f;
 
-        // BackIn
-        // BackOut
-        // BackInOut
+            public static float In(float time)
+            {
+                return time * time * ((overshoot + 1) * time - overshoot);
+            }
+
+            public static float Out(float time)
+            {
+                time -= 1f;
+                return time * time * ((overshoot + 1) * time + overshoot) + 1;
+            }
+
+            public static float InOut(float time)
+            {
+                const float in_out_overshoot = overshoot * 1.525f;
+
+                time *= 2f;
+                if (time < 1f)
+                {
+                    return 0.5f * time * time * ((in_out_overshoot + 1f) * time - in_out_overshoot);
+                }
+
+                time -= 2f;
+                return 0.5f * (time * time * ((in_out_overshoot + 1f) * time + in_out_overshoot) + 2f);
+            }
+        }
     }
 }
