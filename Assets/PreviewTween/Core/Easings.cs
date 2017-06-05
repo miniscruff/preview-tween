@@ -106,6 +106,43 @@
             }
         }
 
+        public static class Bounce
+        {
+            public static float In(float time)
+            {
+                return 1f - Out(1f - time);
+            }
+
+            public static float Out(float time)
+            {
+                if (time < 1f / 2.75f)
+                {
+                    return 7.5625f * time * time;
+                }
+                if (time < 2 / 2.75)
+                {
+                    time -= 1.5f / 2.75f;
+                    return 7.5625f * time * time + 0.75f;
+                }
+                if (time < 2.5 / 2.75)
+                {
+                    time -= 2.25f / 2.75f;
+                    return 7.5625f * time * time + 0.9375f;
+                }
+                time -= 2.625f / 2.75f;
+                return 7.5625f * time * time + 0.984375f;
+            }
+
+            public static float InOut(float time)
+            {
+                if (time < 0.5f)
+                {
+                    return In(time * 2f) * 0.5f;
+                }
+                return Out(time * 2 - 1f) * 0.5f + 0.5f;
+            }
+        }
+
         // BounceIn
         // BounceOut
         // BounceInOut

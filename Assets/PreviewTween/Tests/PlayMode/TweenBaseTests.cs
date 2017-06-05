@@ -639,6 +639,19 @@
             _tween.easingMode = EasingMode.QuinticInOut;
             _tween.Apply();
             Assert.IsTrue(Mathf.Approximately(Easings.Quintic.InOut(progress), _tween.value));
+
+            // Bounce
+            _tween.easingMode = EasingMode.BounceIn;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Bounce.In(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.BounceOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Bounce.Out(progress), _tween.value));
+
+            _tween.easingMode = EasingMode.BounceInOut;
+            _tween.Apply();
+            Assert.IsTrue(Mathf.Approximately(Easings.Bounce.InOut(progress), _tween.value));
         }
 
         [Test]

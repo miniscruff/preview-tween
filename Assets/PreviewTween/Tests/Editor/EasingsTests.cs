@@ -173,5 +173,23 @@
         {
             CompareEasingToCache(Easings.Quintic.InOut, "QuinticInOut");
         }
+
+        [Test]
+        public void Bounce_In()
+        {
+            CompareEasingToCache(Easings.Bounce.In, "BounceIn");
+        }
+
+        [Test]
+        public void Bounce_Out()
+        {
+            CompareEasingToCache(Easings.Bounce.Out, "BounceOut");
+        }
+
+        [Test]
+        public void Bounce_InOut()
+        {
+            CompareEasingToCache(Easings.Bounce.InOut, "BounceInOut");
+        }
     }
 }
