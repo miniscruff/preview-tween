@@ -1,5 +1,6 @@
 ﻿namespace PreviewTween
 {
+    using System;
     using System.Collections.Generic;
     using UnityEditor;
     using UnityEngine;
@@ -29,23 +30,26 @@
         private TweenBase _tween;
         private PreviewMode _previewMode;
 
+        private string[] _easingNames;
+
         private bool _cachedIsProSkin;
         private GUIStyle _leftStyle;
         private GUIStyle _middleStyle;
         private GUIStyle _rightStyle;
         private GUIStyle _thumbStyle;
 
-        private GUIContent _recordStartContent;
-        private GUIContent _rewindContent;
-        private GUIContent _playContent;
-        private GUIContent _pauseContent;
-        private GUIContent _forwardContent;
-        private GUIContent _recordEndContent;
+        private readonly Color _barColor = new Color(0.26f, 0.58f, 1f);
+        private readonly Color _backgroundColor = new Color(0.15f, 0.15f, 0.15f);
+
+        private Texture2D _recordStartContent;
+        private Texture2D _rewindContent;
+        private Texture2D _playContent;
+        private Texture2D _pauseContent;
+        private Texture2D _forwardContent;
+        private Texture2D _recordEndContent;
 
         private void OnEnable()
         {
-            _tween = (TweenBase)target;
-
             _delayProperty = serializedObject.FindProperty("_delay");
             _durationProperty = serializedObject.FindProperty("_duration");
             _playModeProperty = serializedObject.FindProperty("_playMode");
@@ -85,8 +89,14 @@
 
         public override void OnInspectorGUI()
         {
+            if (_tween == null)
+            {
+                _tween = (TweenBase)target;
+            }
+
             LoadStyles();
             LoadTextures();
+            LoadEasingNames();
 
             serializedObject.Update();
 
@@ -121,12 +131,36 @@
 
             string iconFolderPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Icons/");
 
-            _recordStartContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordStart.png"));
-            _rewindContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Rewind.png"));
-            _playContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Play.png"));
-            _pauseContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Pause.png"));
-            _forwardContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Forward.png"));
-            _recordEndContent = new GUIContent(AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordEnd.png"));
+            _recordStartContent = AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordStart.png");
+            _rewindContent = AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Rewind.png");
+            _playContent = AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Play.png");
+            _pauseContent = AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Pause.png");
+            _forwardContent = AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "Forward.png");
+            _recordEndContent = AssetDatabase.LoadAssetAtPath<Texture2D>(iconFolderPath + "RecordEnd.png");
+        }
+
+        private void LoadEasingNames()
+        {
+            if (_easingNames != null)
+            {
+                return;
+            }
+
+            _easingNames = Enum.GetNames(typeof(EasingMode));
+            for (int i = 0; i < _easingNames.Length; i++)
+            {
+                _easingNames[i] = ObjectNames.NicifyVariableName(_easingNames[i]);
+                // by replacing our In or Outs with /In and /Out we create a simple 2 level popup
+                // which is much easier to find what you are looking for
+                if (_easingNames[i].Contains(" In"))
+                {
+                    _easingNames[i] = _easingNames[i].Replace(" In", " / In");
+                }
+                else if (_easingNames[i].Contains(" Out"))
+                {
+                    _easingNames[i] = _easingNames[i].Replace(" Out", " / Out");
+                }
+            }
         }
 
         private void DrawAdditionalProperties()
@@ -142,7 +176,7 @@
         {
             EditorGUI.BeginDisabledGroup(_previewMode != PreviewMode.None);
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(40));
-            float newValue = EditorHelper.PreviewProgress(progressRect, _tween.progress, _thumbStyle);
+            float newValue = EditorHelper.PreviewProgress(progressRect, _tween.progress, _barColor, _backgroundColor, _thumbStyle);
             if (!Mathf.Approximately(newValue, _tween.progress))
             {
                 _tween.progress = newValue;
@@ -274,12 +308,12 @@
             }
         }
 
-        private bool DrawRecordModeToggle(float currentProgress, GUIContent content, GUIStyle buttonStyle)
+        private bool DrawRecordModeToggle(float currentProgress, Texture texture, GUIStyle buttonStyle)
         {
             bool shouldBeActive = Mathf.Approximately(_tween.progress, currentProgress) && _previewMode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
-            bool result = GUILayout.Button(content, buttonStyle);
+            bool result = GUILayout.Button(texture, buttonStyle);
             EditorGUI.EndDisabledGroup();
             return result;
         }
@@ -304,15 +338,15 @@
             EditorGUILayout.PropertyField(_playModeProperty);
             EditorGUILayout.PropertyField(_wrapModeProperty);
 
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(_easingModeProperty);
-            EasingMode easingMode = (EasingMode)_easingModeProperty.enumValueIndex;
+            int newEasingIndex = EditorGUILayout.Popup(_easingModeProperty.displayName, _easingModeProperty.enumValueIndex, _easingNames);
+            EasingMode easingMode = (EasingMode)newEasingIndex;
 
-            if (EditorGUI.EndChangeCheck() || _easingIcon == null && easingMode != EasingMode.CustomCurve)
+            if (newEasingIndex != _easingModeProperty.enumValueIndex || _easingIcon == null && easingMode != EasingMode.CustomCurve)
             {
+                _easingModeProperty.enumValueIndex = newEasingIndex;
                 if (easingMode != EasingMode.CustomCurve)
                 {
-                    string enumString = ((EasingMode)_easingModeProperty.enumValueIndex).ToString();
+                    string enumString = ((EasingMode)newEasingIndex).ToString();
                     string easingIconPath = EditorHelper.GetProjectDirectory("/Editor/Graphics/Easings/") + enumString + ".png";
                     _easingIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(easingIconPath);
                 }
@@ -324,7 +358,7 @@
 
             if (easingMode == EasingMode.CustomCurve)
             {
-                EditorGUILayout.PropertyField(_customCurveProperty);
+                EditorGUILayout.PropertyField(_customCurveProperty, GUILayout.Height(100));
             }
             else
             {

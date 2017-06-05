@@ -22,24 +22,30 @@
     public enum EasingMode
     {
         Linear,
-        QuadraticIn,
-        QuadraticOut,
-        QuadraticInOut,
-        CubicIn,
-        CubicOut,
-        CubicInOut,
-        QuarticIn,
-        QuarticOut,
-        QuarticInOut,
-        QuinticIn,
-        QuinticOut,
-        QuinticInOut,
-        BounceIn,
-        BounceOut,
-        BounceInOut,
+        // Back
         BackIn,
         BackOut,
         BackInOut,
+        // Bounce
+        BounceIn,
+        BounceOut,
+        BounceInOut,
+        // Cubic
+        CubicIn,
+        CubicOut,
+        CubicInOut,
+        // Quadratic
+        QuadraticIn,
+        QuadraticOut,
+        QuadraticInOut,
+        // Quartic
+        QuarticIn,
+        QuarticOut,
+        QuarticInOut,
+        // Qunitic
+        QuinticIn,
+        QuinticOut,
+        QuinticInOut,
         CustomCurve
     }
 

@@ -207,7 +207,7 @@ MonoBehaviour:
   _duration: 1
   _playMode: 1
   _wrapMode: 2
-  _easingMode: 3
+  _easingMode: 10
   _customCurve:
     serializedVersion: 2
     m_Curve:
