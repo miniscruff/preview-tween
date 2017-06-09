@@ -36,17 +36,19 @@
         private void Reset()
         {
             _target = transform;
+            _start = transform.position;
+            _end = transform.position;
         }
 
 #if UNITY_EDITOR
         public override void RecordStart()
         {
-            _start = transform.position;
+            _start = _worldSpace ? transform.position : transform.localPosition;
         }
 
         public override void RecordEnd()
         {
-            _end = transform.position;
+            _end = _worldSpace ? transform.position : transform.localPosition;
         }
 #endif
 

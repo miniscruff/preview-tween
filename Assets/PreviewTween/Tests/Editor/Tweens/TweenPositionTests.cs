@@ -54,6 +54,71 @@
             Assert.AreNotEqual(new Vector3(15, 0, 0), target.transform.position);
 
             Object.DestroyImmediate(target);
+            Object.DestroyImmediate(parent);
+        }
+
+        [Test]
+        public void RecordStart()
+        {
+            tween.transform.position = new Vector3(75f, 0f, 25f);
+            tween.RecordStart();
+
+            Assert.AreEqual(new Vector3(75f, 0f, 25f), tween.start);
+        }
+
+        [Test]
+        public void RecordEnd()
+        {
+            tween.transform.position = new Vector3(2f, 4f, 6f);
+            tween.RecordEnd();
+
+            Assert.AreEqual(new Vector3(2f, 4f, 6f), tween.end);
+        }
+
+        [Test]
+        public void RecordStart_InLocalMode()
+        {
+            GameObject parent = new GameObject("Parent");
+            parent.transform.position = new Vector3(-10, 10, -10);
+
+            tween.transform.SetParent(parent.transform);
+            tween.worldSpace = false;
+            tween.transform.localPosition = new Vector3(6f, 2f, 4f);
+            tween.RecordStart();
+
+            Assert.AreEqual(new Vector3(6f, 2f, 4f), tween.start);
+            Assert.AreNotEqual(tween.transform.position, tween.start);
+
+            Object.DestroyImmediate(parent);
+        }
+
+        [Test]
+        public void RecordEnd_InLocalMode()
+        {
+            GameObject parent = new GameObject("Parent");
+            parent.transform.position = new Vector3(-10, 10, -10);
+
+            tween.transform.SetParent(parent.transform);
+            tween.worldSpace = false;
+            tween.transform.localPosition = new Vector3(6f, 2f, 4f);
+            tween.RecordEnd();
+
+            Assert.AreEqual(new Vector3(6f, 2f, 4f), tween.end);
+            Assert.AreNotEqual(tween.transform.position, tween.end);
+
+            Object.DestroyImmediate(parent);
+        }
+
+        [Test]
+        public void ResetSetsStartAndEndToCurrentValue()
+        {
+            Object.DestroyImmediate(tween);
+
+            gameObject.transform.position = new Vector3(12f, 14f, 16f);
+            TweenPosition tempTween = gameObject.AddComponent<TweenPosition>();
+
+            Assert.AreEqual(new Vector3(12f, 14f, 16f), tempTween.start);
+            Assert.AreEqual(new Vector3(12f, 14f, 16f), tempTween.end);
         }
     }
 }
