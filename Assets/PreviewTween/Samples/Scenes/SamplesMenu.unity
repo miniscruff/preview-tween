@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 429515926}
   - component: {fileID: 429515925}
   m_Layer: 5
-  m_Name: Button
+  m_Name: BasicCubesButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
