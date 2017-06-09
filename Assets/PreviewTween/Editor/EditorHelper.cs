@@ -4,8 +4,20 @@
     using UnityEditor;
     using UnityEngine;
 
+    /// <summary>
+    /// Some extra editor helper functions for the tween system
+    /// </summary>
     public static class EditorHelper
     {
+        /// <summary>
+        /// Custom progress bar that accepts click and drags to update our tween
+        /// </summary>
+        /// <param name="controlRect">Display rect</param>
+        /// <param name="value">Current value</param>
+        /// <param name="barColor">Color of the progress bar foreground</param>
+        /// <param name="backgroundColor">Color of the progress bar background</param>
+        /// <param name="thumbStyle">Display of the thumb image</param>
+        /// <returns>Updated or same value</returns>
         public static float PreviewProgress(Rect controlRect, float value, Color barColor, Color backgroundColor, GUIStyle thumbStyle)
         {
             Texture2D thumbTexture = thumbStyle.normal.background;
@@ -92,20 +104,25 @@
             return value;
         }
 
+        /// <summary>
+        /// Searches our project folder and finds the preview tween folder and a child path
+        /// </summary>
+        /// <param name="childPath">Known child path we are also searching for</param>
+        /// <returns>Full path to our child search path</returns>
         public static string GetProjectDirectory(string childPath)
         {
-            string iconFolderPath = null;
+            string fullPath = null;
             string[] allDirectories = Directory.GetDirectories("Assets", "PreviewTween", SearchOption.AllDirectories);
             foreach (string dir in allDirectories)
             {
-                iconFolderPath = dir + childPath;
-                if (Directory.Exists(iconFolderPath))
+                fullPath = dir + childPath;
+                if (Directory.Exists(fullPath))
                 {
                     break;
                 }
             }
 
-            return iconFolderPath;
+            return fullPath;
         }
     }
 }

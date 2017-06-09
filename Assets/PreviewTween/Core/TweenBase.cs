@@ -5,20 +5,48 @@
     using UnityEngine;
     using UnityEngine.Events;
 
+    /// <summary>
+    /// How the tween should initially start playing
+    /// </summary>
     public enum PlayMode
     {
+        /// <summary>
+        /// Doesnt play automatically, call PlayForward through script or an event
+        /// </summary>
         None,
+        /// <summary>
+        /// Uses the built in Start function to play
+        /// </summary>
         Start,
+        /// <summary>
+        /// Uses the built in OnEnable function to play
+        /// </summary>
         OnEnable
     }
 
+    /// <summary>
+    /// How the tween should handle reaching the end point
+    /// </summary>
     public enum WrapMode
     {
+        /// <summary>
+        /// Stops, keeping the end value
+        /// </summary>
         Once,
+        /// <summary>
+        /// Starts over from the beginning
+        /// </summary>
         Loop,
+        /// <summary>
+        /// Reverses direction and easing
+        /// </summary>
         PingPong
     }
 
+    /// <summary>
+    /// Built in supported easings, use custom if you want to define something else.
+    /// Note: See easing graphics for a visual of what the easing will do in the app
+    /// </summary>
     public enum EasingMode
     {
         Linear,
@@ -46,11 +74,18 @@
         QuinticIn,
         QuinticOut,
         QuinticInOut,
+        // Other
         CustomCurve
     }
 
+    /// <summary>
+    /// Base abstract class for all tweens
+    /// </summary>
     public abstract class TweenBase : MonoBehaviour
     {
+        /// <summary>
+        /// Small value our duration can have, checked by script and in the editor
+        /// </summary>
         public const float minimum_duration = 0.1f;
 
         // tween values
@@ -67,17 +102,28 @@
         [SerializeField] private AnimationCurve _customCurve = AnimationCurve.Linear(0, 0, 1, 1);
         [SerializeField] private UnityEvent _onComplete = new UnityEvent();
 
+        /// <summary>
+        /// The current progress of the tween from 0 (start) to 1 (end).
+        /// If you manually change this value you will need to call Apply for it to take effect.
+        /// </summary>
         public float progress
         {
             get { return _progress; }
             set { _progress = value; }
         }
 
+        /// <summary>
+        /// Whether or not the tween is currently playing
+        /// </summary>
         public bool isPlaying
         {
             get { return _isPlaying; }
         }
 
+        /// <summary>
+        /// The current direction of the tween where 1 is forward and -1 is in reverse.
+        /// You can not set this value to anything other than 1 and -1 or an error will occur.
+        /// </summary>
         public int direction
         {
             get { return _direction; }
@@ -91,6 +137,11 @@
             }
         }
 
+        /// <summary>
+        /// The amount of time in seconds before the tween actually begins.
+        /// This value is applied to everytime the tween starts again.
+        /// Must be >= 0.
+        /// </summary>
         public float delay
         {
             get { return _delay; }
@@ -104,6 +155,10 @@
             }
         }
 
+        /// <summary>
+        /// The total time in seconds the tween will take place in.
+        /// Will cause jumpy behavior if you drastically change this value while its playing.
+        /// </summary>
         public float duration
         {
             get { return _duration; }
@@ -117,24 +172,37 @@
             }
         }
 
+        /// <summary>
+        /// Current play mode, reference <see cref="PlayMode"/>.
+        /// </summary>
         public PlayMode playMode
         {
             get { return _playMode; }
             set { _playMode = value; }
         }
 
+        /// <summary>
+        /// Current wrap mode, reference <see cref="WrapMode"/>
+        /// </summary>
         public WrapMode wrapMode
         {
             get { return _wrapMode; }
             set { _wrapMode = value; }
         }
 
+        /// <summary>
+        /// Current easing mode, reference <see cref="EasingMode"/>
+        /// </summary>
         public EasingMode easingMode
         {
             get { return _easingMode; }
             set { _easingMode = value; }
         }
 
+        /// <summary>
+        /// Animation curve used when our easing mode is set to Custom.
+        /// Has no effect if our easing is not custom.
+        /// </summary>
         public AnimationCurve customCurve
         {
             get { return _customCurve; }
@@ -169,11 +237,18 @@
             Stop();
         }
 
+        /// <summary>
+        /// Applies our current tween status, should be called if you manually made
+        /// modifications to our values such as progress.
+        /// </summary>
         public void Apply()
         {
             UpdateValue(GetSmoothTime());
         }
 
+        /// <summary>
+        /// Will start our tween if we are enabled.
+        /// </summary>
         public void Play()
         {
             if (!CanPlay())
@@ -189,6 +264,9 @@
             }
         }
 
+        /// <summary>
+        /// Will restart a tween and play again, useful for UI events and wanting to restart.
+        /// </summary>
         public void Replay()
         {
             if (!CanPlay())
@@ -201,6 +279,9 @@
             Play();
         }
 
+        /// <summary>
+        /// Will flip the direction of our tween and start the tween if its not already playing.
+        /// </summary>
         public void Toggle()
         {
             if (!CanPlay())
@@ -224,6 +305,9 @@
             Play();
         }
 
+        /// <summary>
+        /// Stops our tween from playing anymore, doesnt reset progress.
+        /// </summary>
         public void Stop()
         {
             _isPlaying = false;
@@ -246,6 +330,11 @@
             _isPlaying = false;
         }
 
+        /// <summary>
+        /// Mostly used internally for testing but you can manually tick the tween if you wanted to.
+        /// Maybe a jump or fast forward button could use this.
+        /// </summary>
+        /// <param name="deltaTime">The amount of time that our tween should elapse for. Normally Time.deltaTime</param>
         public void Tick(float deltaTime)
         {
             if (deltaTime <= 0f)
@@ -353,13 +442,27 @@
                 case EasingMode.CustomCurve:
                     return _customCurve.Evaluate(_progress);
             }
-            throw new NotImplementedException("Easing [" + _easingMode + "] not yet implemented");
+            throw new NotImplementedException("Easing [" + _easingMode + "] not implemented");
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Used to record the current value of our target and store it directly into our starting value
+        /// Used only in the editor so it should be surrounded by #if UNITY_EDITOR.
+        /// </summary>
         public abstract void RecordStart();
+
+        /// <summary>
+        /// Used to record the current value of our target and store it directly into our ending value.
+        /// Used only in the editor so it should be surrounded by #if UNITY_EDITOR.
+        /// </summary>
         public abstract void RecordEnd();
 #endif
+
+        /// <summary>
+        /// Override to implement the tween change. Usually using Mathf.Lerp, Vector.Lerp or similar.
+        /// </summary>
+        /// <param name="smoothTime">Pre-smoothed progress value</param>
         protected abstract void UpdateValue(float smoothTime);
     }
 }

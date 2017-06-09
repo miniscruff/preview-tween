@@ -12,6 +12,10 @@
         Paused
     }
 
+    /// <summary>
+    /// Custom editor for all tween bases that even includes children properties so you dont have to customize it yourself
+    /// for each new tween you create.
+    /// </summary>
     [CustomEditor(typeof(TweenBase), true)]
     public sealed class TweenBaseEditor : Editor
     {
@@ -100,6 +104,7 @@
 
             serializedObject.Update();
 
+            // this draws any inherited values automatically on top
             DrawAdditionalProperties();
             DrawPreview();
             DrawSettings();
@@ -174,6 +179,7 @@
 
         private void DrawPreview()
         {
+            // draw our progress bar
             EditorGUI.BeginDisabledGroup(_previewMode != PreviewMode.None);
             Rect progressRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(40));
             float newValue = EditorHelper.PreviewProgress(progressRect, _tween.progress, _barColor, _backgroundColor, _thumbStyle);
@@ -185,6 +191,7 @@
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Separator();
 
+            // Draw our controls view inside a centered horizontal layout
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
 
