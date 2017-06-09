@@ -13,7 +13,7 @@
             tween.end = Quaternion.Euler(180f, 0f, 0f);
             tween.progress = 0.5f;
 
-            Assert.AreEqual(tween.gameObject.transform, tween.target);
+            Assert.AreEqual(tween.transform, tween.target);
         }
 
         [Test]
@@ -30,7 +30,7 @@
             tween.target = target.transform;
 
             tween.Apply();
-            Assert.AreEqual(Quaternion.identity, tween.gameObject.transform.rotation);
+            Assert.AreEqual(Quaternion.identity, tween.transform.rotation);
             Assert.IsTrue(Quaternion.Euler(135f, 0f, 0f) == target.transform.rotation);
 
             Object.DestroyImmediate(target);
@@ -49,7 +49,7 @@
             tween.worldSpace = false;
 
             tween.Apply();
-            Assert.AreEqual(Quaternion.identity, tween.gameObject.transform.rotation);
+            Assert.AreEqual(Quaternion.identity, tween.transform.rotation);
             Assert.IsTrue(Quaternion.Euler(135f, 0f, 0f) == target.transform.localRotation);
             Assert.IsFalse(Quaternion.Euler(135f, 0f, 0f) == target.transform.rotation);
 
@@ -73,6 +73,32 @@
             tween.RecordEnd();
 
             Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.end);
+        }
+
+        [Test]
+        public void RecordStart_WithTarget()
+        {
+            GameObject target = new GameObject("Target");
+            target.transform.rotation = Quaternion.Euler(15f, 0f, 15f);
+
+            tween.target = target.transform;
+            tween.RecordStart();
+
+            Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.start);
+            Object.DestroyImmediate(target);
+        }
+
+        [Test]
+        public void RecordEnd_WithTarget()
+        {
+            GameObject target = new GameObject("Target");
+            target.transform.rotation = Quaternion.Euler(15f, 0f, 15f);
+
+            tween.target = target.transform;
+            tween.RecordEnd();
+
+            Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.end);
+            Object.DestroyImmediate(target);
         }
 
         [Test]

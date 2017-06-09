@@ -2,12 +2,11 @@
 {
     using UnityEngine;
 
-    public sealed class TweenPosition : TweenBase
+    public sealed class TweenScale : TweenBase
     {
         [SerializeField] private Transform _target;
         [SerializeField] private Vector3 _start;
         [SerializeField] private Vector3 _end;
-        [SerializeField] private bool _worldSpace = true;
 
         public Transform target
         {
@@ -27,41 +26,28 @@
             set { _end = value; }
         }
 
-        public bool worldSpace
-        {
-            get { return _worldSpace; }
-            set { _worldSpace = value; }
-        }
-
         private void Reset()
         {
             _target = transform;
-            _start = transform.position;
-            _end = transform.position;
+            _start = transform.localScale;
+            _end = transform.localScale;
         }
 
 #if UNITY_EDITOR
         public override void RecordStart()
         {
-            _start = _worldSpace ? target.position : target.localPosition;
+            _start = _target.localScale;
         }
 
         public override void RecordEnd()
         {
-            _end = _worldSpace ? target.position : target.localPosition;
+            _end = _target.localScale;
         }
 #endif
 
         protected override void UpdateValue(float smoothTime)
         {
-            if (_worldSpace)
-            {
-                _target.position = Vector3.LerpUnclamped(_start, _end, smoothTime);
-            }
-            else
-            {
-                _target.localPosition = Vector3.LerpUnclamped(_start, _end, smoothTime);
-            }
+            _target.localScale = Vector3.LerpUnclamped(_start, _end, smoothTime);
         }
     }
 }

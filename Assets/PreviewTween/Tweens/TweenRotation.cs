@@ -43,12 +43,12 @@
 #if UNITY_EDITOR
         public override void RecordStart()
         {
-            _start = _worldSpace ? transform.rotation : transform.localRotation;
+            _start = _worldSpace ? target.rotation : target.localRotation;
         }
 
         public override void RecordEnd()
         {
-            _end = _worldSpace ? transform.rotation : transform.localRotation;
+            _end = _worldSpace ? target.rotation : target.localRotation;
         }
 #endif
 
