@@ -4,4 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/PreviewTween/Samples/Scenes/SamplesMenu.unity
+    guid: 4b515233965ed3d4aadf8ae0bdc58d1c
+  - enabled: 1
+    path: Assets/PreviewTween/Samples/Scenes/BasicCubes.unity
+    guid: 00000000000000000000000000000000
