@@ -33,7 +33,6 @@
             _end = transform.localScale;
         }
 
-#if UNITY_EDITOR
         public override void RecordStart()
         {
             _start = _target.localScale;
@@ -43,7 +42,6 @@
         {
             _end = _target.localScale;
         }
-#endif
 
         protected override void UpdateValue(float smoothTime)
         {

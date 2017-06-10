@@ -40,7 +40,6 @@
             _end = transform.eulerAngles;
         }
 
-#if UNITY_EDITOR
         public override void RecordStart()
         {
             _start = _worldSpace ? target.eulerAngles : target.localEulerAngles;
@@ -50,7 +49,6 @@
         {
             _end = _worldSpace ? target.eulerAngles : target.localEulerAngles;
         }
-#endif
 
         protected override void UpdateValue(float smoothTime)
         {

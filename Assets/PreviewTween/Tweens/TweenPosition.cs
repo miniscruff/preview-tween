@@ -40,7 +40,6 @@
             _end = transform.position;
         }
 
-#if UNITY_EDITOR
         public override void RecordStart()
         {
             _start = _worldSpace ? target.position : target.localPosition;
@@ -50,7 +49,6 @@
         {
             _end = _worldSpace ? target.position : target.localPosition;
         }
-#endif
 
         protected override void UpdateValue(float smoothTime)
         {

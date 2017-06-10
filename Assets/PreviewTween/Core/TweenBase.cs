@@ -445,19 +445,15 @@
             throw new NotImplementedException("Easing [" + _easingMode + "] not implemented");
         }
 
-#if UNITY_EDITOR
         /// <summary>
         /// Used to record the current value of our target and store it directly into our starting value
-        /// Used only in the editor so it should be surrounded by #if UNITY_EDITOR.
         /// </summary>
         public abstract void RecordStart();
 
         /// <summary>
         /// Used to record the current value of our target and store it directly into our ending value.
-        /// Used only in the editor so it should be surrounded by #if UNITY_EDITOR.
         /// </summary>
         public abstract void RecordEnd();
-#endif
 
         /// <summary>
         /// Override to implement the tween change. Usually using Mathf.Lerp, Vector.Lerp or similar.
