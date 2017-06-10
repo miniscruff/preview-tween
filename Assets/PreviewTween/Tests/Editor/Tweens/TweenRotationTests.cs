@@ -9,8 +9,8 @@
         {
             base.SetUp();
 
-            tween.start = Quaternion.Euler(90f, 0f, 0f);
-            tween.end = Quaternion.Euler(180f, 0f, 0f);
+            tween.start = new Vector3(90f, 0f, 0f);
+            tween.end = new Vector3(180f, 0f, 0f);
             tween.progress = 0.5f;
 
             Assert.AreEqual(tween.transform, tween.target);
@@ -63,7 +63,7 @@
             tween.transform.rotation = Quaternion.Euler(15f, 0f, 15f);
             tween.RecordStart();
 
-            Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.start);
+            Assert.IsTrue(new Vector3(15f, 0f, 15f) == tween.start);
         }
 
         [Test]
@@ -72,7 +72,7 @@
             tween.transform.rotation = Quaternion.Euler(15f, 0f, 15f);
             tween.RecordEnd();
 
-            Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.end);
+            Assert.IsTrue(new Vector3(15f, 0f, 15f) == tween.end);
         }
 
         [Test]
@@ -84,7 +84,7 @@
             tween.target = target.transform;
             tween.RecordStart();
 
-            Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.start);
+            Assert.IsTrue(new Vector3(15f, 0f, 15f) == tween.start);
             Object.DestroyImmediate(target);
         }
 
@@ -97,7 +97,7 @@
             tween.target = target.transform;
             tween.RecordEnd();
 
-            Assert.AreEqual(Quaternion.Euler(15f, 0f, 15f), tween.end);
+            Assert.IsTrue(new Vector3(15f, 0f, 15f) == tween.end);
             Object.DestroyImmediate(target);
         }
 
@@ -112,7 +112,7 @@
             tween.transform.localRotation = Quaternion.Euler(-90f, 0f, 45f);
             tween.RecordStart();
 
-            Assert.IsTrue(Quaternion.Euler(-90f, 0f, 45f) == tween.start);
+            Assert.IsTrue(Quaternion.Euler(-90f, 0f, 45f).eulerAngles == tween.start);
             Assert.AreNotEqual(tween.transform.rotation, tween.start);
 
             Object.DestroyImmediate(parent);
@@ -129,7 +129,7 @@
             tween.transform.localRotation = Quaternion.Euler(-90f, 0f, 45f);
             tween.RecordEnd();
 
-            Assert.IsTrue(Quaternion.Euler(-90f, 0f, 45f) == tween.end);
+            Assert.IsTrue(Quaternion.Euler(-90f, 0f, 45f).eulerAngles == tween.end);
             Assert.AreNotEqual(tween.transform.rotation, tween.end);
 
             Object.DestroyImmediate(parent);
@@ -140,11 +140,11 @@
         {
             Object.DestroyImmediate(tween);
 
-            gameObject.transform.rotation = Quaternion.Euler(0f, 45f, -45f);
+            gameObject.transform.rotation = Quaternion.Euler(0f, 45f, 45f);
             TweenRotation tempTween = gameObject.AddComponent<TweenRotation>();
 
-            Assert.AreEqual(Quaternion.Euler(0f, 45f, -45f), tempTween.start);
-            Assert.AreEqual(Quaternion.Euler(0f, 45f, -45f), tempTween.end);
+            Assert.IsTrue(new Vector3(0f, 45f, 45f) == tempTween.start);
+            Assert.IsTrue(new Vector3(0f, 45f, 45f) == tempTween.end);
         }
     }
 }

@@ -91,6 +91,19 @@
             return true;
         }
 
+        private void OnDisable()
+        {
+            if (_previewMode != PreviewMode.None)
+            {
+                _tween.progress = 0f;
+                _tween.direction = 1;
+                _tween.Apply();
+
+                EditorApplication.update -= UpdatePreview;
+            }
+            _previewMode = PreviewMode.None;
+        }
+
         public override void OnInspectorGUI()
         {
             if (_tween == null)
@@ -172,7 +185,7 @@
         {
             foreach (SerializedProperty custom in _additionalProperties)
             {
-                EditorGUILayout.PropertyField(custom);
+                EditorGUILayout.PropertyField(custom, true);
             }
             EditorGUILayout.Separator();
         }

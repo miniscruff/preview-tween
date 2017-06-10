@@ -5,8 +5,8 @@
     public sealed class TweenRotation : TweenBase
     {
         [SerializeField] private Transform _target;
-        [SerializeField] private Quaternion _start;
-        [SerializeField] private Quaternion _end;
+        [SerializeField] private Vector3 _start;
+        [SerializeField] private Vector3 _end;
         [SerializeField] private bool _worldSpace = true;
 
         public Transform target
@@ -15,13 +15,13 @@
             set { _target = value; }
         }
 
-        public Quaternion start
+        public Vector3 start
         {
             get { return _start; }
             set { _start = value; }
         }
 
-        public Quaternion end
+        public Vector3 end
         {
             get { return _end; }
             set { _end = value; }
@@ -36,19 +36,19 @@
         private void Reset()
         {
             _target = transform;
-            _start = transform.rotation;
-            _end = transform.rotation;
+            _start = transform.eulerAngles;
+            _end = transform.eulerAngles;
         }
 
 #if UNITY_EDITOR
         public override void RecordStart()
         {
-            _start = _worldSpace ? target.rotation : target.localRotation;
+            _start = _worldSpace ? target.eulerAngles : target.localEulerAngles;
         }
 
         public override void RecordEnd()
         {
-            _end = _worldSpace ? target.rotation : target.localRotation;
+            _end = _worldSpace ? target.eulerAngles : target.localEulerAngles;
         }
 #endif
 
@@ -56,11 +56,11 @@
         {
             if (_worldSpace)
             {
-                _target.rotation = Quaternion.LerpUnclamped(_start, _end, smoothTime);
+                _target.rotation = Quaternion.Euler(Vector3.LerpUnclamped(_start, _end, smoothTime));
             }
             else
             {
-                _target.localRotation = Quaternion.LerpUnclamped(_start, _end, smoothTime);
+                _target.localRotation = Quaternion.Euler(Vector3.LerpUnclamped(_start, _end, smoothTime));
             }
         }
     }
