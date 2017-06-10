@@ -221,7 +221,7 @@
 
         private void DrawRecordStartButton()
         {
-            if (DrawRecordModeToggle(0f, _recordStartContent, _leftStyle))
+            if (DrawRecordModeToggle(_recordStartContent, _leftStyle))
             {
                 Undo.RecordObject(target, "Recording Start Value");
                 _tween.RecordStart();
@@ -230,7 +230,7 @@
 
         private void DrawRecordEndButton()
         {
-            if (DrawRecordModeToggle(1f, _recordEndContent, _rightStyle))
+            if (DrawRecordModeToggle(_recordEndContent, _rightStyle))
             {
                 Undo.RecordObject(target, "Recording End Value");
                 _tween.RecordEnd();
@@ -328,9 +328,9 @@
             }
         }
 
-        private bool DrawRecordModeToggle(float currentProgress, Texture texture, GUIStyle buttonStyle)
+        private bool DrawRecordModeToggle(Texture texture, GUIStyle buttonStyle)
         {
-            bool shouldBeActive = Mathf.Approximately(_tween.progress, currentProgress) && _previewMode == PreviewMode.None;
+            bool shouldBeActive = _previewMode == PreviewMode.None;
             EditorGUI.BeginDisabledGroup(!shouldBeActive);
 
             bool result = GUILayout.Button(texture, buttonStyle);
