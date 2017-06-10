@@ -10,4 +10,10 @@ EditorBuildSettings:
     guid: 4b515233965ed3d4aadf8ae0bdc58d1c
   - enabled: 1
     path: Assets/PreviewTween/Samples/Scenes/BasicCubes.unity
+    guid: 73fe78be8866aa84dadd7d2b4e846710
+  - enabled: 1
+    path: Assets/PreviewTween/Samples/Scenes/BouncingBalls.unity
+    guid: 48e353e3d527cd740addd2bd54ea1e26
+  - enabled: 1
+    path: Assets/PreviewTween/Samples/Scenes/RandomBalls.unity
     guid: 00000000000000000000000000000000
