@@ -21,11 +21,8 @@ Preview tween uses automated tests to confirm the features of the system are all
 ## Basic Usage
 1. Prepare the object you are going to tween, in our example we are going to use a simple Tween Position with a box.
 1. Add the tween component to the object you want to tween. You can put it on any object and link it using the target variable but if you put it on the same object it will auto-find the target for you.
-![](docs/AddComponent.gif)
 1. Configure the start and end values, I like to use the Record Start and Record End buttons. This allows you to edit the object as it appears in the scene and simply record this value as either the start or end of the tween.
-![](docs/EditStartAndEnd.gif)
 1. Doing a quick preview now is a good way to check the start and end values. This is a key feature of the plugin and makes working with tweens a lot easier.
-![](docs/PlayPreview.gif)
 1. After that we can configure all the tween settings and continue to preview the changes using the preview bar. Specific setting details are below.
 
 ### Settings
