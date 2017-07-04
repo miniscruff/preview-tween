@@ -84,7 +84,7 @@
     public abstract class TweenBase : MonoBehaviour
     {
         /// <summary>
-        /// Small value our duration can have, checked by script and in the editor
+        /// Smallest value our duration can have, checked by script and in the editor
         /// </summary>
         public const float minimum_duration = 0.1f;
 
@@ -209,8 +209,10 @@
             set { _customCurve = value; }
         }
 
-        // Kinda lame but UnityEvents arent considered events so resharper thinks it should just be complete
-        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Event executed after the tween is complete,
+        /// called after each run if wrap mode is loop or ping pong
+        /// </summary>
         public UnityEvent onComplete
         {
             get { return _onComplete; }
@@ -239,7 +241,7 @@
 
         /// <summary>
         /// Applies our current tween status, should be called if you manually made
-        /// modifications to our values such as progress.
+        /// modifications to tween values such as progress.
         /// </summary>
         public void Apply()
         {
@@ -265,7 +267,7 @@
         }
 
         /// <summary>
-        /// Will restart a tween and play again, useful for UI events and wanting to restart.
+        /// Will restart a tween and play again, useful for UI events.
         /// </summary>
         public void Replay()
         {
@@ -359,29 +361,29 @@
 
         private void HandleWrapping()
         {
-            if (wrapMode == WrapMode.Once)
+            switch (wrapMode)
             {
-                _isPlaying = false;
-                _progress = Mathf.Clamp01(_progress);
-            }
-            else if (wrapMode == WrapMode.Loop)
-            {
-                // we add one incase we are < 0
-                _progress = (_progress + 1f) % 1f;
-            }
-            else if (wrapMode == WrapMode.PingPong)
-            {
-                // ping pong bounces progress and flips direction
-                if (_progress < 0f)
-                {
-                    _progress *= -1;
-                    _direction = 1;
-                }
-                else if (_progress > 1f)
-                {
-                    _progress = 2f - _progress;
-                    _direction = -1;
-                }
+                case WrapMode.Once:
+                    _isPlaying = false;
+                    _progress = Mathf.Clamp01(_progress);
+                    break;
+                case WrapMode.Loop:
+                    // we add one incase we are < 0
+                    _progress = (_progress + 1f) % 1f;
+                    break;
+                case WrapMode.PingPong:
+                    // ping pong bounces progress and flips direction
+                    if (_progress < 0f)
+                    {
+                        _progress *= -1;
+                        _direction = 1;
+                    }
+                    else if (_progress > 1f)
+                    {
+                        _progress = 2f - _progress;
+                        _direction = -1;
+                    }
+                    break;
             }
         }
 
