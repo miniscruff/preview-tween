@@ -16,4 +16,7 @@ EditorBuildSettings:
     guid: 48e353e3d527cd740addd2bd54ea1e26
   - enabled: 1
     path: Assets/PreviewTween/Samples/Scenes/RandomBalls.unity
+    guid: df6af5ee9dc8c2f4ab85411f924c8ee8
+  - enabled: 1
+    path: Assets/PreviewTween/Samples/Scenes/UITweens.unity
     guid: 00000000000000000000000000000000
