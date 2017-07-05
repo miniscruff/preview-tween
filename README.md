@@ -5,7 +5,7 @@
 A tween system built around an intuitive inspector and being able to preview your tween directly in the editor exactly as it will be in the game, all without having to press play.
 
 ## Demo
-If you would like to see all the sample scenes running in your browser, [click here](https://developer.cloud.unity3d.com/share/-J0p_5e0IG/) to demo the project from unity cloud build.
+If you would like to see all the sample scenes running in your browser, [click here](https://developer.cloud.unity3d.com/share/WysjrJmz_G/) to demo the project from unity cloud build.
 
 ## Installation
 1. Download the latest release from the [Github Releases Page](https://github.com/miniscruff/preview-tween/releases).
