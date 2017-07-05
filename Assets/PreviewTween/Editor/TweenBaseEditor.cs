@@ -200,6 +200,7 @@
             {
                 _tween.progress = newValue;
                 _tween.Apply();
+                EditorUtility.SetDirty(_tween);
             }
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.Separator();
@@ -247,6 +248,7 @@
                 _tween.progress = 0f;
                 _tween.direction = 1;
                 _tween.Apply();
+                EditorUtility.SetDirty(_tween);
             }
 
             EditorGUI.EndDisabledGroup();
@@ -262,6 +264,7 @@
                 _tween.progress = 1f;
                 _tween.direction = -1;
                 _tween.Apply();
+                EditorUtility.SetDirty(_tween);
             }
 
             EditorGUI.EndDisabledGroup();
@@ -320,6 +323,7 @@
             // keep our delta time to 30fps as unity likes to have a massive delay for our first frame
             float dt = Mathf.Min(Time.deltaTime, 0.033f);
             _tween.Tick(dt);
+            EditorUtility.SetDirty(_tween);
 
             if (_tween.progress >= 1f && _tween.wrapMode == WrapMode.Once)
             {
