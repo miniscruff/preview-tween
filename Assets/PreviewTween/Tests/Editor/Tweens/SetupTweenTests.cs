@@ -21,7 +21,12 @@
         [SetUp]
         public virtual void SetUp()
         {
-            _gameObject = new GameObject("Tween");
+            SetUp(new GameObject("Tween"));
+        }
+
+        protected void SetUp(GameObject precreatedObject)
+        {
+            _gameObject = precreatedObject;
             _tween = _gameObject.AddComponent<T>();
         }
 
